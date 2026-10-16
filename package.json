@@ -15,7 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "karma start karma.conf.js",
+    "test": "karma start Karma.conf.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
