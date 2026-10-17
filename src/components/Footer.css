@@ -1,0 +1,45 @@
+footer{
+    width: 100%;
+    height: auto;
+    background-color:#000000;
+    
+}
+.footer1{
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px; 
+}
+
+.footer2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 90%;
+    height: auto;
+    border-top: 2px solid rgb(189, 189, 189);
+    padding: 20px;
+    margin: auto;
+}
+.pie-pagina{
+    text-align: start;
+    align-items: start;
+    width: 100%;
+    height: auto;
+    margin-top: 30px;
+}
+
+footer img {
+    width: 60%;
+    padding: 10px;
+}
+
+.pie-pagina a, span {
+    font-size: normal;
+    font-family: "Changa One", sans-serif;
+    font-weight: 400px;
+    font-style: normal;
+    color: #faf7f3;
+}
