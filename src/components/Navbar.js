@@ -1,13 +1,14 @@
 import './Navbar.css'
-
+import { Link } from 'react-router-dom'
+ 
 function Navbar() {
     return (
         <header>
             <nav className="nav-bar">
                 <div className="navbar">
-                    <a href="index.html">
+                    <Link to="/">
                         <img src="images/Cachelogo.png" className="nav-logo" alt="logo"/>
-                    </a>
+                    </Link>
                 </div>
 
                 <form className="search-box">
