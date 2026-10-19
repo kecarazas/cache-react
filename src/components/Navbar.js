@@ -34,16 +34,16 @@ function Navbar() {
                 <details>
                     <summary>Categorías</summary>
                     <ul className="submenu">
-                    <li><Link to="/Productos/mouse">Mouses</Link></li>
-                    <li><Link to="/Productos/mousepad">Mousepads</Link></li>
-                    <li><Link to="/Productos/teclado">Teclados</Link></li>
-                    <li><Link to="/Productos/skate">Skates</Link></li>
-                    <li><Link to="/Productos/audifono">Audífonos</Link></li>
-                    <li><Link to="/Productos/manga">Mangas</Link></li>
+                    <li><Link to="/Categoria/mouse">Mouses</Link></li>
+                    <li><Link to="/Categoria/mousepad">Mousepads</Link></li>
+                    <li><Link to="/Categoria/teclado">Teclados</Link></li>
+                    <li><Link to="/Categoria/skate">Skates</Link></li>
+                    <li><Link to="/Categoria/audifonos">Audífonos</Link></li>
+                    <li><Link to="/Categoria/mangas">Mangas</Link></li>
                     </ul>
                 </details>
                 </li>
-                <li><Link to="/Productos">Productos</Link></li>
+                <li><Link to="/Categoria">Productos</Link></li>
                 <li><Link to="/Blogs">Blogs</Link></li>
                 <li><Link to="/Nosotros">Nosotros</Link></li>
                 <li><Link to="/Contacto">Contacto</Link></li>

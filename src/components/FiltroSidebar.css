@@ -1,0 +1,121 @@
+/* ---- Sidebar de filtros ---- */
+.filtros-sidebar{
+    position: sticky;
+    top: 20px;
+    margin-top: 30px;
+}
+
+.filtros-titulo{
+    font-family: "Changa One", sans-serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: #d6c7c2;
+    margin-bottom: 20px;
+}
+
+.filtro-grupo{
+    border-bottom: 1px solid rgba(214,199,194,0.15);
+    padding: 16px 0;
+    margin-top: 30px;
+}
+
+.filtro-header{
+    width: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Changa One", sans-serif;
+    font-size: 1rem;
+    color: #d6c7c2;
+    cursor: pointer;
+    padding: 0;
+}
+
+.filtro-flecha{
+    font-size: 0.75rem;
+    color: #b08d57;
+    transition: transform 0.2s ease;
+}
+
+.filtro-header.colapsado .filtro-flecha{
+    transform: rotate(180deg);
+}
+
+.filtro-contenido{
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filtro-contenido.oculto{
+    display: none;
+}
+
+.filtro-check{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.9rem;
+    color: #d6c7c2;
+    cursor: pointer;
+}
+
+.filtro-check input{
+    accent-color: #b08d57;
+    cursor: pointer;
+}
+
+.filtro-cantidad{
+    opacity: 0.6;
+    font-size: 0.8rem;
+}
+
+.precio-max-texto{
+    font-family: "Roboto", sans-serif;
+    font-size: 0.85rem;
+    color: #d6c7c2;
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+
+.rango-precio{
+    width: 100%;
+    accent-color: #b08d57;
+}
+
+.precio-min-max{
+    display: flex;
+    justify-content: space-between;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.85rem;
+    color: #d6c7c2;
+    opacity: 0.8;
+    margin-top: 8px;
+}
+
+.color-grid{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.color-swatch{
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(214,199,194,0.3);
+    cursor: pointer;
+    padding: 0;
+}
+
+.color-swatch:hover{
+    border-color: #b08d57;
+}
+
+.color-swatch.multicolor{
+    background: conic-gradient(red, orange, yellow, green, blue, violet, red);
+}

@@ -1,0 +1,9 @@
+.categoria-seccion{
+    width: min(94%, 1500px);
+    margin: 20px auto 60px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
