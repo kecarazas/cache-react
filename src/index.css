@@ -7,10 +7,11 @@
   text-decoration: none;
   scrollbar-width: thin;
   scrollbar-color: #c4c8cc transparent;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
-  margin-top: 89px;
+  margin-top: 80px;
   min-height: 100vh;
   background-color: #2b2426;
 }
