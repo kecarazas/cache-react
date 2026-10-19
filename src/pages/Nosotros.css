@@ -1,0 +1,25 @@
+.sobre-nosotros {
+    width: 80%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a1a;
+
+    margin: 30px auto 0;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.about {
+    width: 100%;
+}
+
+.texto {
+    width: 100%;
+    color: #d6c7c2;
+    font-family: "Inter", sans-serif;
+    font-size: large;
+    text-align: justify;
+    line-height: 1.6;
+}
