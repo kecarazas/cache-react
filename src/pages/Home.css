@@ -1,0 +1,70 @@
+.seccion2{
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.prod1{
+  width: min(94%, 1600px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.prod2{
+  width: 100%;
+  aspect-ratio: 710 / 500;
+  background-color: black;
+  overflow: hidden;
+}
+.prod2, .cards2{
+  position: relative; 
+}
+.cards{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
+  transform-origin: -110% 80%;
+  transition: transform 0.3s ease;
+}
+
+.cards:hover{
+  transform: scale(1.06);
+}
+
+.cards2{
+  width: 100%;
+  aspect-ratio: 340 / 500;
+  overflow: hidden;
+  background-color: black;
+}
+
+.img-cat{
+  width: 85%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
+  transform-origin: -250% 90%;
+  transition: transform 0.3s ease;
+}
+
+.img-cat:hover{
+  transform: scale(1.06);
+}
+
+.texto-barra{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 2; /* para que quede sobre la imagen */
+  font-family: "Changa One", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
