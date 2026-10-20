@@ -1,9 +1,18 @@
 import './Navbar.css'
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
  
 function Navbar() {
     const [menuAbierto, setMenuAbierto] = useState(false);
+    const {sesion, cerrarSesion} = useAuth();
+    const navigate = useNavigate();
+
+    const salir = () => {
+        cerrarSesion();
+        navigate("/");
+    };
+
     return (
     <header>
         <nav className="cabecera">
@@ -60,6 +69,20 @@ function Navbar() {
                     <span className="carrito-count oculto">0</span>
                 </Link>
             <div className="auth-area" id="auth-area" />
+                {sesion ? (
+                <>
+                    <span>Hola, {sesion.nombre}</span>
+                    <button type="button" className="btn-link" onClick={salir}>
+                    Cerrar sesión
+                    </button>
+                </>
+                ) : (
+                <>
+                    <Link to="/login">Iniciar sesión</Link>
+                    <span>|</span>
+                    <Link to="/registro">Registrarse</Link>
+                </>
+                )}
             </div>
         </nav>
     </header>
