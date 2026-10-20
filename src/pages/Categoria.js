@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import FiltroSidebar from "../components/FiltroSidebar";
 import ProductoGrid from "../components/ProductoGrid";
-import { productosPorCategoria } from "../data/productos";
+import { todosLosProductos } from "../data/productos";
 import "./Categoria.css";
 
 function Categoria() {
@@ -13,12 +13,15 @@ function Categoria() {
     teclado: "Teclados",
     skate: "Skates",
     audifonos: "Audífonos",
-    mangas: "Mangas"
+    mangas: "Mangas",
   };
 
   const nombre = nombres[producto] || "Productos";
 
-  const productos = productosPorCategoria[producto] || [];
+  // Obtener los productos con su slug correspondiente
+  const productos = todosLosProductos.filter(
+    (item) => item.categoria === producto
+  );
 
   return (
     <section className="categoria-seccion">
@@ -30,9 +33,7 @@ function Categoria() {
         {productos.length > 0 ? (
           <ProductoGrid productos={productos} />
         ) : (
-          <p>
-            Próximamente encontrarás productos de {nombre}.
-          </p>
+          <p>Próximamente encontrarás productos de {nombre}.</p>
         )}
       </main>
     </section>
