@@ -1,0 +1,345 @@
+
+/* ==============================
+   LISTADO DE BLOGS
+============================== */
+
+.pagina-blogs {
+    width: 100%;
+}
+
+.hero-blogs {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+}
+
+.hero-blogs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(90%, 520px);
+    padding: 20px 30px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.88);
+    border-radius: 8px;
+}
+
+.hero-content h2 {
+    margin-bottom: 12px;
+    font-size: 2rem;
+}
+
+.hero-content p {
+    line-height: 1.6;
+}
+
+.lista-blogs {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 45px var(--espaciado-lateral) 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.blogs-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.blogs-encabezado h2 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.blogs-encabezado input {
+    width: 100%;
+    max-width: 320px;
+    padding: 11px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.blogs-encabezado input:focus {
+    outline: 2px solid var(--verde);
+    outline-offset: 2px;
+}
+
+.blog-card {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    background-color: var(--blanco);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.blog-card > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    padding: 12px;
+    object-fit: contain;
+    background-color: #f7f7f5;
+}
+
+.blog-card-contenido {
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.fecha-blog {
+    display: block;
+    color: #888;
+    font-size: 0.8125rem;
+    margin-bottom: 10px;
+}
+
+.blog-card-contenido h3 {
+    margin: 0 0 12px;
+    font-size: 1.375rem;
+    line-height: 1.35;
+}
+
+.blog-card-contenido p {
+    color: var(--texto-suave);
+    line-height: 1.75;
+    margin: 0 0 20px;
+    font-size: 0.9375rem;
+}
+
+.blog-card-contenido a {
+    display: inline-block;
+    width: fit-content;
+    margin-top: auto;
+    padding: 10px 22px;
+    background-color: var(--verde);
+    color: var(--blanco);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.blog-card-contenido a:hover {
+    background-color: var(--verde-oscuro);
+}
+
+.blogs-vacio {
+    padding: 25px 0;
+    text-align: center;
+    color: var(--texto-suave);
+}
+
+/* ==============================
+   DETALLE DEL BLOG
+============================== */
+
+.blog-detalle-pagina {
+    max-width: 1000px;
+    min-height: 60vh;
+    margin: 0 auto;
+    padding: 25px var(--espaciado-lateral) 45px;
+}
+
+.volver-cont {
+    margin-bottom: 20px;
+}
+
+.volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--verde-oscuro);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.volver:hover {
+    text-decoration: underline;
+}
+
+.blog-detalle {
+    max-width: 800px;
+    margin: 0 auto 35px;
+    padding: 35px 45px 45px;
+    background-color: var(--blanco);
+    border-radius: 10px;
+    box-shadow: var(--sombra);
+}
+
+.blog-detalle .blog-detalle-imagen {
+    display: block;
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    background-color: #f7f7f5;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 28px;
+}
+
+.blog-detalle-texto h1 {
+    margin: 10px 0 16px;
+    font-size: 2rem;
+    line-height: 1.3;
+}
+
+.blog-detalle .fecha-blog {
+    color: #888;
+    font-size: 0.8125rem;
+    margin-bottom: 12px;
+}
+
+.blog-categoria {
+    display: inline-block;
+    width: fit-content;
+    padding: 6px 12px;
+    margin: 8px 0 16px;
+    border-radius: 20px;
+    background-color: #e8eee8;
+    color: var(--verde-oscuro);
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.blog-resumen {
+    margin: 20px 0 28px;
+    color: var(--texto-suave);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+}
+
+.blog-articulo-contenido p {
+    margin-bottom: 22px;
+    color: #333;
+    font-size: 1.0625rem;
+    line-height: 1.9;
+    letter-spacing: 0.15px;
+    text-align: justify;
+}
+
+.volver-final {
+    display: inline-block;
+    margin-top: 12px;
+    color: var(--verde-oscuro);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.volver-final:hover {
+    text-decoration: underline;
+}
+
+/* ==============================
+   TABLETS
+============================== */
+
+@media (max-width: 1023px) {
+    .hero-blogs {
+        height: 230px;
+    }
+
+    .blog-card {
+        grid-template-columns: 250px minmax(0, 1fr);
+    }
+
+    .blog-card-contenido {
+        padding: 22px 24px;
+    }
+
+    .blog-detalle {
+        padding: 30px;
+    }
+}
+
+/* ==============================
+   TELÉFONOS
+============================== */
+
+@media (max-width: 767px) {
+    .hero-blogs {
+        height: 180px;
+    }
+
+    .hero-content {
+        padding: 16px 20px;
+    }
+
+    .hero-content h2 {
+        font-size: 1.4rem;
+    }
+
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+
+    .lista-blogs {
+        padding: 28px var(--espaciado-lateral) 45px;
+        gap: 20px;
+    }
+
+    .blogs-encabezado {
+        align-items: stretch;
+    }
+
+    .blogs-encabezado input {
+        max-width: none;
+    }
+
+    .blog-card {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-card > img {
+        height: 200px;
+        min-height: 180px;
+    }
+
+    .blog-card-contenido {
+        padding: 22px;
+    }
+
+    .blog-card-contenido h3 {
+        font-size: 1.15rem;
+    }
+
+    .blog-detalle-pagina {
+        padding-top: 20px;
+    }
+
+    .blog-detalle {
+        margin: 16px 0 35px;
+        padding: 22px 20px 30px;
+    }
+
+    .blog-detalle .blog-detalle-imagen {
+        height: 200px;
+        margin-bottom: 22px;
+    }
+
+    .blog-detalle-texto h1 {
+        font-size: 1.4rem;
+    }
+
+    .blog-articulo-contenido p {
+        font-size: 1rem;
+        line-height: 1.85;
+        text-align: left;
+    }
+}

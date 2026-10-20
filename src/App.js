@@ -10,7 +10,7 @@ import Login from './pages/Login';
 import Contacto from './pages/Contacto';
 import Producto from './pages/Producto';
 import Registro from './pages/Registro';
-
+import Blog from './pages/Blog';
 
 function App() {
   return (
@@ -28,6 +28,7 @@ function App() {
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/producto/:slug" element={<Producto />} />
+          <Route path="/blogs" element={<Blog />} />
         </Routes>
 
       </div>
