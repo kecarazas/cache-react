@@ -1,3 +1,4 @@
+import './Auth.css'
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { regiones } from "../data/regiones";
@@ -241,8 +242,8 @@ export default function Registro() {
     <main>
       <section className="seccion-auth">
         <div className="auth-logo">
-          <img src="/img/artTools_v2.png" alt="Art Tools" />
-          <h1>Art Tools</h1>
+            <img src="/images/Cachelogo.png" alt="" />
+            <h1>Caché</h1>
         </div>
 
         <form className="form-card" onSubmit={handleSubmit} noValidate>

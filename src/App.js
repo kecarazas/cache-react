@@ -9,6 +9,7 @@ import Nosotros from './pages/Nosotros';
 import Login from './pages/Login';
 import Contacto from './pages/Contacto';
 import Producto from './pages/Producto';
+import Registro from './pages/Registro';
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/categoria/:producto" element={<Categoria />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/producto/:slug" element={<Producto />} />
