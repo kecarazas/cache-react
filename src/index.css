@@ -1,5 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+:root {
+    --verde: #77942e;
+    --verde-oscuro: #00543d;
+    --verde-medio: #3a6324;
+    --gris-fondo: #f0eeee;
+    --blanco: #ffffff;
+    --texto: #222222;
+    --texto-suave: #555555;
+    --borde: #cccccc;
+    --rojo: #c0392b;
+    --gris-oscuro: #3b3b3b;
+
+    --ancho-max: 1280px;
+    --radio: 8px;
+    --sombra: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --espaciado-lateral: 40px;
+}
 
 *{
   margin: 0;

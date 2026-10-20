@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Categoria from './pages/Categoria';
 import Nosotros from './pages/Nosotros';
 import Login from './pages/Login';
+import Contacto from './pages/Contacto';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/login" element={<Login />} />
           <Route path="/nosotros" element={<Nosotros />} />
-
+          <Route path="/contacto" element={<Contacto />} />
         </Routes>
 
       </div>
