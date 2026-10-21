@@ -334,13 +334,13 @@ table.admin-tabla .stock-bajo {
 }
 
 .badge-rol.administrador {
-  background-color: #ece4fb;
-  color: #5b21b6;
+  background-color: #e9efdc;
+  color: #3a6324;
 }
 
 .badge-rol.vendedor {
-  background-color: #dfe8fc;
-  color: #1d4ed8;
+  background-color: #f5eddd;
+  color: #765b2c;
 }
 
 .badge-rol.cliente {
@@ -368,12 +368,12 @@ table.admin-tabla .stock-bajo {
 }
 
 .accion-editar {
-  background-color: #e8f0fb;
-  color: #1d4ed8;
+  background-color: #e9efdc;
+  color: #3a6324;
 }
 
 .accion-editar:hover {
-  background-color: #d3e2f7;
+  background-color: #dce8c8;
 }
 
 .accion-eliminar {

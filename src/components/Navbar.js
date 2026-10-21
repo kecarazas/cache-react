@@ -60,7 +60,7 @@ function Navbar() {
                         </details>
                     </li>  
                 </li>
-                <li><Link to="/Categoria">Productos</Link></li>
+                <li><Link to="/categoria/mouse">Productos</Link></li>
                 <li><Link to="/Blogs">Blogs</Link></li>
                 <li><Link to="/Nosotros">Nosotros</Link></li>
                 <li><Link to="/Contacto">Contacto</Link></li>

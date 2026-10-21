@@ -1,26 +1,66 @@
-import "../../styles/Nosotros.css"
+import "../../styles/Nosotros.css";
 
 function Nosotros() {
-    return (
-        <div class = "sobre-nosotros">
-            <div className="about">
-                <h1 className="titulo">Sobre Nosotros</h1>
-                <p className="texto">
-                    En Caché, somos una empresa dedicada a la venta de periféricos y componentes de computación, fundada en 2025 con el objetivo de 
-                    ofrecer a nuestros clientes productos de calidad, tecnología de vanguardia y un servicio cercano y confiable. 
-                    Desde nuestros inicios, nos hemos enfocado en construir un catálogo que combine las mejores marcas del mercado 
-                    con precios competitivos, abarcando desde componentes esenciales como placas madre, procesadores, 
-                    tarjetas gráficas y memorias RAM, hasta periféricos como teclados, mouses, audífonos y monitores para gamers, profesionales y usuarios en general.
-                    Nuestra misión es acompañar a cada cliente en la construcción, actualización o mantenimiento de su equipo, 
-                    brindando asesoría experta y soporte postventa que genere confianza y satisfacción en cada compra.
-                    Creemos en la innovación constante, por lo que trabajamos día a día para mantenernos actualizados 
-                    con las últimas tendencias tecnológicas, asegurando que nuestros clientes siempre tengan acceso a lo mejor del mercado.
-                    Hoy, Caché se ha consolidado como un referente en la venta de periféricos y componentes, 
-                    gracias a la confianza de miles de clientes que nos eligen una y otra vez.
-                </p>
-            </div>
+  return (
+    <main className="sobre-nosotros">
+      <section className="nosotros-hero">
+        <p className="nosotros-etiqueta">Tecnología para tu setup</p>
+        <h1>Sobre Caché</h1>
+        <p>
+          Elegimos periféricos para que disfrutes más cada partida, proyecto
+          y momento frente a tu computador.
+        </p>
+      </section>
+
+      <section className="nosotros-intro" aria-labelledby="nosotros-origen">
+        <div className="nosotros-acento" aria-hidden="true" />
+        <div>
+          <h2 id="nosotros-origen">Un setup que se siente tuyo</h2>
+          <p>
+            En Caché acercamos el mundo de la tecnología y el gaming a quienes
+            quieren armar o renovar su espacio. Reunimos periféricos y
+            accesorios para distintos estilos y necesidades, con información
+            clara para que puedas elegir con confianza.
+          </p>
+          <p>
+            Creemos que una buena experiencia empieza antes de encender el
+            equipo: por eso queremos ayudarte a encontrar los productos que
+            mejor se adapten a ti.
+          </p>
         </div>
-    )
+      </section>
+
+      <section className="nosotros-principios" aria-label="Nuestros principios">
+        <article className="nosotros-card">
+          <span aria-hidden="true">01</span>
+          <h2>Lo que nos mueve</h2>
+          <p>
+            Hacer más fácil descubrir y elegir periféricos para cada tipo de
+            usuario, desde quien empieza su setup hasta quien busca llevarlo
+            al siguiente nivel.
+          </p>
+        </article>
+
+        <article className="nosotros-card">
+          <span aria-hidden="true">02</span>
+          <h2>Cómo lo hacemos</h2>
+          <p>
+            Con un catálogo cuidadosamente presentado, atención cercana y
+            recomendaciones honestas, priorizando una compra informada.
+          </p>
+        </article>
+
+        <article className="nosotros-card">
+          <span aria-hidden="true">03</span>
+          <h2>En qué creemos</h2>
+          <p>
+            En la tecnología como una forma de crear, jugar y conectar. Cada
+            persona tiene su propio estilo; queremos ayudarle a expresarlo.
+          </p>
+        </article>
+      </section>
+    </main>
+  );
 }
 
 export default Nosotros;

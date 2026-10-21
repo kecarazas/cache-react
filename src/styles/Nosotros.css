@@ -1,25 +1,102 @@
 .sobre-nosotros {
-    width: 80%;
-    height: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #1a1a1a;
-
-    margin: 30px auto 0;
-    padding: 30px;
-    box-sizing: border-box;
+    width: min(1120px, 92%);
+    margin: 42px auto 72px;
+    color: #f3eee9;
 }
 
-.about {
-    width: 100%;
+.nosotros-hero {
+    padding: clamp(36px, 7vw, 78px);
+    border: 1px solid rgba(176, 141, 87, 0.28);
+    border-radius: 16px;
+    background:
+        radial-gradient(ellipse at 85% 15%, rgba(176, 141, 87, 0.16), transparent 45%),
+        linear-gradient(135deg, #30282a, #1a1617 72%);
 }
 
-.texto {
-    width: 100%;
+.nosotros-etiqueta {
+    margin-bottom: 12px;
+    color: #c3a36d;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.nosotros-hero h1 {
+    margin-bottom: 14px;
+    color: #fffaf4;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+.nosotros-hero > p:last-child {
+    max-width: 640px;
     color: #d6c7c2;
-    font-family: "Inter", sans-serif;
-    font-size: large;
-    text-align: justify;
-    line-height: 1.6;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+}
+
+.nosotros-intro {
+    display: grid;
+    grid-template-columns: 5px minmax(0, 1fr);
+    gap: 26px;
+    max-width: 850px;
+    margin: 64px auto;
+}
+
+.nosotros-acento {
+    border-radius: 5px;
+    background: #b08d57;
+}
+
+.nosotros-intro h2,
+.nosotros-card h2 {
+    margin-bottom: 12px;
+    color: #fffaf4;
+    font-size: 1.35rem;
+}
+
+.nosotros-intro p,
+.nosotros-card p {
+    color: #d6c7c2;
+    line-height: 1.75;
+}
+
+.nosotros-intro p + p {
+    margin-top: 12px;
+}
+
+.nosotros-principios {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.nosotros-card {
+    padding: 26px;
+    border: 1px solid rgba(214, 199, 194, 0.12);
+    border-radius: 12px;
+    background-color: #211c1e;
+}
+
+.nosotros-card > span {
+    display: inline-block;
+    margin-bottom: 22px;
+    color: #b08d57;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+@media (max-width: 700px) {
+    .sobre-nosotros {
+        margin: 24px auto 48px;
+    }
+
+    .nosotros-intro {
+        margin: 40px auto;
+    }
+
+    .nosotros-principios {
+        grid-template-columns: 1fr;
+    }
 }

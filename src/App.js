@@ -21,6 +21,7 @@ import AdminProductos from "./pages/admin/AdminProductos";
 import AdminProductoForm from "./pages/admin/AdminProductoForm";
 import AdminUsuarios from "./pages/admin/AdminUsuarios";
 import AdminUsuarioForm from "./pages/admin/AdminUsuarioForm";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   const location = useLocation();
@@ -29,7 +30,7 @@ export default function App() {
   return (
     <div className={`app ${esAdmin ? "app-admin" : ""}`}>
       {!esAdmin && <Navbar />}
-
+      <ScrollToTop />
       <div className="contenido">
         <Routes>
           <Route path="/" element={<Home />} />
