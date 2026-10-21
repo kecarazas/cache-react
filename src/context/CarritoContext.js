@@ -9,6 +9,7 @@ import { todosLosProductos } from "../data/productos";
 
 const CLAVE_CARRITO = "at_carrito";
 const CLAVE_CUPON = "at_cupon";
+const CLAVE_PEDIDOS = "at_pedidos";
 
 const COSTO_ENVIO = 2990;
 const ENVIO_GRATIS_DESDE = 20000;
@@ -237,6 +238,143 @@ export function CarritoProvider({ children }) {
     setItems([]);
   }
 
+  function confirmarCompra(datosCliente) {
+    if (items.length === 0 || productosCarrito.length === 0) {
+      return {
+        ok: false,
+        mensaje: "No se pudo realizar la compra porque el carrito está vacío."
+      };
+    }
+
+    const camposObligatorios = [
+      "nombre",
+      "correo",
+      "telefono",
+      "region",
+      "comuna",
+      "direccion"
+    ];
+
+    if (
+      !datosCliente ||
+      camposObligatorios.some(
+        (campo) =>
+          typeof datosCliente[campo] !== "string" ||
+          !datosCliente[campo].trim()
+      ) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datosCliente.correo.trim()) ||
+      !/^[0-9+ ()-]{8,20}$/.test(datosCliente.telefono.trim())
+    ) {
+      return {
+        ok: false,
+        mensaje: "No se pudo realizar la compra. Revisa el correo, teléfono y datos de entrega."
+      };
+    }
+
+    const productoNoDisponible = productosCarrito.find((producto) => {
+      const limite = obtenerLimiteStock(producto);
+      return producto.cantidad < 1 || producto.cantidad > limite;
+    });
+
+    if (productoNoDisponible) {
+      return {
+        ok: false,
+        mensaje: `No se pudo realizar la compra. Revisa el stock de ${productoNoDisponible.nombre}.`
+      };
+    }
+
+    const ahora = new Date();
+    const pedido = {
+      id: `PED-${ahora.getTime()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+      fecha: ahora.toISOString(),
+      estado: "recibido",
+      cliente: Object.fromEntries(
+        camposObligatorios.map((campo) => [
+          campo,
+          datosCliente[campo].trim()
+        ])
+      ),
+      productos: productosCarrito.map((producto) => ({
+        slug: producto.slug,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        cantidad: producto.cantidad,
+        subtotal: producto.subtotal
+      })),
+      totales: { ...totales }
+    };
+
+    let valoresAnteriores;
+
+    try {
+      valoresAnteriores = {
+        pedidos: localStorage.getItem(CLAVE_PEDIDOS),
+        carrito: localStorage.getItem(CLAVE_CARRITO),
+        cupon: localStorage.getItem(CLAVE_CUPON)
+      };
+
+      const pedidosGuardados = valoresAnteriores.pedidos
+        ? JSON.parse(valoresAnteriores.pedidos)
+        : [];
+
+      if (!Array.isArray(pedidosGuardados)) {
+        throw new Error("El historial de pedidos no es válido.");
+      }
+
+      localStorage.setItem(
+        CLAVE_PEDIDOS,
+        JSON.stringify([...pedidosGuardados, pedido])
+      );
+      localStorage.setItem(CLAVE_CARRITO, "[]");
+      localStorage.removeItem(CLAVE_CUPON);
+    } catch (error) {
+      if (valoresAnteriores) {
+        try {
+          if (valoresAnteriores.pedidos === null) {
+            localStorage.removeItem(CLAVE_PEDIDOS);
+          } else {
+            localStorage.setItem(
+              CLAVE_PEDIDOS,
+              valoresAnteriores.pedidos
+            );
+          }
+          if (valoresAnteriores.carrito === null) {
+            localStorage.removeItem(CLAVE_CARRITO);
+          } else {
+            localStorage.setItem(
+              CLAVE_CARRITO,
+              valoresAnteriores.carrito
+            );
+          }
+          if (valoresAnteriores.cupon === null) {
+            localStorage.removeItem(CLAVE_CUPON);
+          } else {
+            localStorage.setItem(CLAVE_CUPON, valoresAnteriores.cupon);
+          }
+        } catch (errorRestauracion) {
+          console.error(
+            "No se pudo restaurar el carrito tras fallar el checkout.",
+            errorRestauracion
+          );
+        }
+      }
+
+      console.error("No se pudo guardar el pedido.", error);
+      return {
+        ok: false,
+        mensaje: "No se pudo realizar la compra. Inténtalo nuevamente."
+      };
+    }
+
+    setItems([]);
+    setCupon(null);
+
+    return {
+      ok: true,
+      pedido
+    };
+  }
+
   function aplicarCupon(codigoIngresado) {
     const codigo = String(codigoIngresado || "")
       .trim()
@@ -335,6 +473,7 @@ export function CarritoProvider({ children }) {
         actualizarCantidad,
         quitarDelCarrito,
         vaciarCarrito,
+        confirmarCompra,
         aplicarCupon,
         quitarCupon
       }}
