@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCarrito } from "../../context/CarritoContext";
+import "../../styles/Carrito.css";
 
 function formatCLP(valor) {
   return (
@@ -62,7 +63,7 @@ export default function Carrito() {
     <main>
       <div className="volver-cont">
         <Link className="volver" to="/">
-          <img src="/img/flecha.png" alt="" />
+          <img src="/images/flecha.png" alt="" />
           Volver
         </Link>
       </div>
