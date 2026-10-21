@@ -14,6 +14,7 @@ import Producto from "./pages/store/Producto";
 import Registro from "./pages/store/Registro";
 import Blog from "./pages/store/Blog";
 import BlogDetalle from "./pages/store/BlogDetalle";
+import Carrito from "./pages/store/Carrito";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProductos from "./pages/admin/AdminProductos";
@@ -37,42 +38,20 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/contacto" element={<Contacto />} />
+          <Route path="/carrito" element={<Carrito />} />
           <Route path="/producto/:slug" element={<Producto />} />
           <Route path="/blogs" element={<Blog />} />
           <Route path="/blogs/:id" element={<BlogDetalle />} />
 
+
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-
-            <Route
-              path="productos"
-              element={<AdminProductos />}
-            />
-
-            <Route
-              path="productos/nuevo"
-              element={<AdminProductoForm />}
-            />
-
-            <Route
-              path="productos/editar/:codigo"
-              element={<AdminProductoForm />}
-            />
-
-            <Route
-              path="usuarios"
-              element={<AdminUsuarios />}
-            />
-
-            <Route
-              path="usuarios/nuevo"
-              element={<AdminUsuarioForm />}
-            />
-
-            <Route
-              path="usuarios/editar/:correo"
-              element={<AdminUsuarioForm />}
-            />
+            <Route index element={<AdminDashboard />}/>
+            <Route path="productos" element={<AdminProductos />}/>
+            <Route path="productos/nuevo" element={<AdminProductoForm />}/>
+            <Route path="productos/editar/:codigo" element={<AdminProductoForm />}/>
+            <Route path="usuarios" element={<AdminUsuarios />}/>
+            <Route element={<AdminUsuarioForm />}/>
+            <Route path="usuarios/editar/:correo"element={<AdminUsuarioForm />}/>
           </Route>
         </Routes>
       </div>

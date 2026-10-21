@@ -123,29 +123,26 @@ header {
 }
 
 .menu > li > a,
-.menu-categorias > summary {
-    color: #ffffff;
-    text-decoration: none;
-    font-family: "Changa", sans-serif;
-    font-weight: 400;
-    cursor: pointer;
-    transition: color 0.2s ease, font-weight 0.2s ease;
-}
-
-.menu > li > a {
-    color: #ffffff;
-    opacity: 0.85;
+.menu .menu-categorias > details > summary {
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0.85;
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .menu > li > a:hover,
+.menu > li > a:focus-visible,
 .menu > li > a.active,
-.menu-categorias > summary:hover,
-.menu-categorias > summary.activo {
-    color: #b08d57;
-    opacity: 1;
-    font-weight: 900;
+.menu > li > a.activo,
+.menu .menu-categorias > details > summary:hover,
+.menu .menu-categorias > details > summary:focus-visible,
+.menu .menu-categorias > details > summary.activo {
+  color: #b08d57;
+  opacity: 1;
 }
-
 /* Categorías */
 .menu-categorias {
     position: relative;
