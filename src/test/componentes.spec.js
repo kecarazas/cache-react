@@ -1,211 +1,206 @@
-import React , {act} from "react";
-import {createRoot} from "react-dom/client";
+
+import React, { act } from "react";
+import { createRoot } from "react-dom/client";
 
 import {
   ListaProductos,
   MensajeError,
   Boton,
   FormularioNombre,
-  Contador
-} from "../components/pruebas/ComponentesPrueba";
+  Contador,
+} from "../components/pruebas/componentesPrueba";
 
 const h = React.createElement;
+
 describe("Pruebas de componentes", () => {
-    let contenedor;
-    let root;
-    let entornoActAnterior;
+  let contenedor;
+  let root;
+  let entornoActAnterior;
 
-    beforeEach(() => {
-        entornoActAnterior = globalThis.IS_REACT_ACT_ENVIRONMENT;
+  beforeEach(() => {
+    entornoActAnterior = globalThis.IS_REACT_ACT_ENVIRONMENT;
+    globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-        globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+    contenedor = document.createElement("div");
+    document.body.appendChild(contenedor);
 
-        contenedor = document.createElement("div");
-        document.body.appendChild(contenedor);
+    root = createRoot(contenedor);
+  });
 
-        root = createRoot(contenedor);
+  afterEach(async () => {
+    await act(async () => {
+      root.unmount();
     });
 
-    afterEach(async () => {
-        await act(async () => {
-            root.unmount();
-        });
+    contenedor.remove();
+    globalThis.IS_REACT_ACT_ENVIRONMENT = entornoActAnterior;
+  });
 
-        contenedor.remove();
+  async function renderizar(elemento) {
+    await act(async () => {
+      root.render(elemento);
+    });
+  }
 
-        globalThis.IS_REACT_ACT_ENVIRONMENT = entornoActAnterior;
+  describe("Renderizado de listas", () => {
+    it("renderiza todos los productos recibidos", async () => {
+      const productos = [
+        {
+          slug: "mouse-1",
+          nombre: "Mouse Gamer",
+        },
+        {
+          slug: "teclado-1",
+          nombre: "Teclado Mecánico",
+        },
+        {
+          slug: "mousepad-1",
+          nombre: "Mousepad XL",
+        },
+      ];
+
+      await renderizar(h(ListaProductos, { productos }));
+
+      const elementos = contenedor.querySelectorAll("li");
+
+      const nombres = Array.from(
+        elementos,
+        (elemento) => elemento.textContent
+      );
+
+      expect(elementos.length).toBe(productos.length);
+
+      expect(nombres).toEqual(
+        productos.map((producto) => producto.nombre)
+      );
     });
 
-    async function renderizar(elemento) {
-        await act(async() => {
-            root.render(elemento);
-        });
-    }
+    it("no renderiza elementos si la lista está vacía", async () => {
+      await renderizar(
+        h(ListaProductos, { productos: [] })
+      );
 
-    describe("Renderizado de listas", () => {
-        it("renderiza todos los productos recibidos", async () => {
-            const productos = [
-                {
-                    slug: "mouse-1",
-                    nombre: "Mouse Gamer"
-                },
-                {
-                    slug: "teclado-1",
-                    nombre: "Teclado Mecánico"   
-                },
-                {
-                    slug: "mousepad-1",
-                    nombre: "Mousepad XL"
-                }
-            ];
+      expect(
+        contenedor.querySelectorAll("li").length
+      ).toBe(0);
+    });
+  });
 
-            await renderizar(
-                h(ListaProductos, {productos})
-            );
+  describe("Renderizado condicional", () => {
+    it("muestra el error y lo oculta cuando se corrige", async () => {
+      await renderizar(
+        h(MensajeError, {
+          error: "El correo es obligatorio.",
+        })
+      );
 
-            const elementos = contenedor.querySelectorAll("li");
+      const mensaje = contenedor.querySelector('[role="alert"]');
 
-            const nombres = Array.from(
-                elementos,
-                (elemento) => elemento.textContent
-            );
+      expect(mensaje).not.toBeNull();
+      expect(mensaje.textContent).toBe(
+        "El correo es obligatorio."
+      );
 
-            expect(elementos.length).toBe(productos.length);
+      await renderizar(
+        h(MensajeError, { error: "" })
+      );
 
-            expect(nombres).toEqual(
-                productos.map((producto) => producto.nombre)
-            );
-        });
+      expect(
+        contenedor.querySelector('[role="alert"]')
+      ).toBeNull();
+    });
+  });
 
-        it("no renderiza elementos si la lista esta vacia", async () => {
-            await renderizar(
-                h(ListaProductos, {productos: []})
-            );
+  describe("Props del botón", () => {
+    it("muestra la etiqueta recibida", async () => {
+      await renderizar(
+        h(Boton, {
+          etiqueta: "Agregar al carrito",
+          onClick: () => {},
+        })
+      );
 
-            expect(
-                contenedor.querySelectorAll("li").length
-            ).toBe(0);
-        });
+      expect(
+        contenedor.querySelector("button").textContent
+      ).toBe("Agregar al carrito");
     });
 
-    describe("Renderizado condicional", () => {
-        it("muestra el error y lo oculta cuando se corrige", async () =>{
-            await renderizar(
-                h(MensajeError, {
-                    error: "El correo es obligatorio."
-                })
-            );
+    it("ejecuta el onClick recibido al hacer clic", async () => {
+      const manejarClick = jasmine.createSpy("manejarClick");
 
-            const mensaje = contenedor.querySelector('[role="alert"]');
-            expect(mensaje).not.toBeNull();
+      await renderizar(
+        h(Boton, {
+          etiqueta: "Registrar",
+          onClick: manejarClick,
+        })
+      );
 
-            expect(mensaje.textContent).toBe(
-                "El correo es obligatorio."
-            );
+      expect(manejarClick).not.toHaveBeenCalled();
 
-            await renderizar(
-                h(MensajeError, {error: ""})
-            );
+      await act(async () => {
+        contenedor.querySelector("button").click();
+      });
 
-            expect(
-                contenedor.querySelector('[role="alert"]')
-            ).toBeNull();
-        });
+      expect(manejarClick).toHaveBeenCalledTimes(1);
     });
+  });
 
-    describe("Props del botón", () => {
-        it("Muestra la etiqueta recibida", async() =>{
-            await renderizar(
-                h(
-                    Boton, {
-                        etiqueta: "Agregar al carrito",
-                        onClick: () => {}
-                    }
-                )
-            );
+  describe("Estado del formulario", () => {
+    it("actualiza el estado cuando el usuario escribe", async () => {
+      await renderizar(h(FormularioNombre));
 
-            expect(contenedor.querySelector("button").textContent).toBe("Agregar al carrito");
-        });
+      const input = contenedor.querySelector(
+        'input[name="nombre"]'
+      );
 
-        it("ejecuta el onClick recibido al hacer clic", async () => {
-        const manejarClick =
-            jasmine.createSpy("manejarClick");
+      const salida = contenedor.querySelector(
+        '[data-testid="nombre-actual"]'
+      );
 
-        await renderizar(
-            h(Boton, {
-            etiqueta: "Registrar",
-            onClick: manejarClick
-            })
+      expect(input.value).toBe("");
+      expect(salida.textContent).toBe("Nombre ingresado: ");
+
+      const establecerValor = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value"
+      ).set;
+
+      await act(async () => {
+        establecerValor.call(input, "Ash");
+
+        input.dispatchEvent(
+          new Event("input", { bubbles: true })
         );
+      });
 
-        expect(manejarClick).not.toHaveBeenCalled();
-
-        await act(async () => {
-            contenedor.querySelector("button").click();
-        });
-
-        expect(manejarClick).toHaveBeenCalledTimes(1);
-        });
+      expect(input.value).toBe("Ash");
+      expect(salida.textContent).toBe("Nombre ingresado: Ash");
     });
+  });
 
-    describe("Estado del formulario", () => {
-        it("actualiza el estado cuando el usuario escribe", async() =>{
-            await renderizar(
-                h(FormularioNombre)
-            );
+  describe("Eventos y cambios de estado", () => {
+    it("aumenta el contador al hacer clic", async () => {
+      await renderizar(h(Contador));
 
-            const input = contenedor.querySelector('input[name="nombre"]');
+      const cantidad = contenedor.querySelector(
+        '[data-testid="cantidad"]'
+      );
 
-            const salida = contenedor.querySelector( '[data-testid="nombre-actual"]');
-            
-            expect(input.value).toBe("");
-            expect(salida.textContent).toBe(
-                "Nombre ingresado: "
-            );
+      const boton = contenedor.querySelector("button");
 
-            const establecerValor = Object.getOwnPropertyDescriptor(
-                HTMLInputElement.prototype, "value"
-            ).set;
+      expect(cantidad.textContent).toBe("Cantidad: 0");
 
-            await act(async () => {
-                establecerValor.call(input, "Ash");
+      await act(async () => {
+        boton.click();
+      });
 
-                input.dispatchEvent(
-                    new Event("input", {bubbles: true})
-                );
-            });
+      expect(cantidad.textContent).toBe("Cantidad: 1");
 
-            expect(input.value).toBe("Ash");
+      await act(async () => {
+        boton.click();
+      });
 
-            expect(salida.textContent).toBe("Nombre ingresado: Ash");
-        });
+      expect(cantidad.textContent).toBe("Cantidad: 2");
     });
-
-    describe("Eventos y cambios de estado", () => {
-        it("aumenta el contenedor al hacer clic", async () => {
-            await renderizar(
-                h(Contador)
-            );
-
-            const cantidad = contenedor.querySelector('[data-testid="cantidad"]');
-
-            const boton = contenedor.querySelector("button");
-
-            expect(cantidad.textContent).toBe("Cantidad: 0");
-
-            await act(async() =>{
-                boton.click();
-            });
-
-            expect(cantidad.textContent).toBe("Cantidad: 1");
-
-            await act(async() => {
-                boton.click();
-            });
-
-            expect(cantidad.textContent).toBe(
-                "Cantidad: 2"
-            );
-        });
-    });
+  });
 });
