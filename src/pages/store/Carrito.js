@@ -86,7 +86,7 @@ export default function Carrito() {
                   >
                     <div className="img-p-carrito">
                       <img
-                        src={`/img/${producto.imagen}`}
+                        src={`/images/${producto.imagen}`}
                         alt={producto.nombre}
                       />
                     </div>

@@ -70,7 +70,7 @@ function Navbar() {
                 <input type="text" id="busqueda" name="q" placeholder="Mouse" />
                 </form>
             </div>
-                <Link to="/Carrito" className="carrito-nav" aria-label="Ver carrito de compras">
+                <Link to="/carrito" className="carrito-nav" aria-label="Ver carrito de compras">
                     <img src="images/carrito-de-compras.png" alt="Carrito de compras" />
                     <span className="carrito-count oculto">0</span>
                 </Link>
