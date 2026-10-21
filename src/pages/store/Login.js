@@ -139,13 +139,13 @@ export default function Login() {
       mensaje: `¡Bienvenido/a, ${usuario.nombre}! Redirigiendo...`
     });
 
-    const esStaff =
-      usuario.tipoUsuario === "administrador" ||
-      usuario.tipoUsuario === "vendedor";
-
-    setTimeout(() => {
-      navigate(esStaff ? "/admin" : "/");
-    }, 900);
+    if (usuario.tipoUsuario === "administrador") {
+      navigate("/admin", { replace: true });
+    } else if (usuario.tipoUsuario === "vendedor") {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    }
   };
 
   return (
