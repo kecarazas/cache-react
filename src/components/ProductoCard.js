@@ -1,14 +1,27 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useCarrito } from "../context/CarritoContext";
 import "./ProductoCard.css";
 
 function ProductoCard({ producto }) {
+  const { agregarAlCarrito } = useCarrito();
+  const [mensajeCarrito, setMensajeCarrito] = useState("");
+
+  function agregarProducto(evento) {
+    evento.preventDefault();
+    evento.stopPropagation();
+    const resultado = agregarAlCarrito(producto.slug);
+    setMensajeCarrito(resultado.mensaje);
+  }
+
   return (
     <article className="producto-card">
-      <Link
-        to={`/producto/${producto.slug}`}
-        className="producto-card-enlace"
-      >
-        <div className="producto-card-imagen">
+      <div className="producto-card-imagen">
+        <Link
+          to={`/producto/${producto.slug}`}
+          className="producto-card-enlace"
+          aria-label={`Ver ${producto.nombre}`}
+        >
           <img
             src={`/images/${producto.imagen}`}
             alt={producto.nombre}
@@ -27,21 +40,22 @@ function ProductoCard({ producto }) {
               {producto.descuento}
             </span>
           )}
+        </Link>
+        <button
+          type="button"
+          className="btn-cart-flotante"
+          aria-label={`Agregar ${producto.nombre} al carrito`}
+          disabled={producto.stock === false}
+          onClick={agregarProducto}
+        >
+          🛒
+        </button>
+      </div>
 
-          <button
-            type="button"
-            className="btn-cart-flotante"
-            aria-label={`Agregar ${producto.nombre} al carrito`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log("Agregar al carrito:", producto.nombre);
-            }}
-          >
-            🛒
-          </button>
-        </div>
-
+      <Link
+        to={`/producto/${producto.slug}`}
+        className="producto-card-enlace"
+      >
         {/* Marca del producto */}
         {producto.marca && (
           <p className="producto-card-marca">
@@ -67,6 +81,11 @@ function ProductoCard({ producto }) {
           ${producto.precio.toLocaleString("es-CL")} CLP
         </p>
       </Link>
+      {mensajeCarrito && (
+        <p className="producto-card-mensaje" role="status">
+          {mensajeCarrito}
+        </p>
+      )}
     </article>
   );
 }

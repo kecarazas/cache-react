@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { todosLosProductos } from "../../data/productos";
+import { useCarrito } from "../../context/CarritoContext";
 import "../../styles/Producto.css";
 
 function Producto() {
     const { slug } = useParams();
+    const { agregarAlCarrito } = useCarrito();
 
     const producto = todosLosProductos.find(
     (item) => item.slug === slug
@@ -13,6 +15,7 @@ function Producto() {
     const [imagenPrincipal, setImagenPrincipal] = useState(null);
     const [cantidad, setCantidad] = useState(1);
     const [tabActiva, setTabActiva] = useState("descripcion");
+    const [mensajeCarrito, setMensajeCarrito] = useState("");
 
     if (!producto) {
         return (
@@ -43,6 +46,11 @@ function Producto() {
         producto.descripcion || "Descripción próximamente disponible.";
 
     const opiniones = producto.opiniones || 0;
+
+    function handleAgregarAlCarrito() {
+        const resultado = agregarAlCarrito(producto.slug, cantidad);
+        setMensajeCarrito(resultado.mensaje);
+    }
 
     return (
         <section className="producto-seccion">
@@ -153,12 +161,22 @@ function Producto() {
                                 type="number"
                                 id="cantidad"
                                 min="1"
+                                max={
+                                    typeof producto.stock === "number"
+                                        ? producto.stock
+                                        : undefined
+                                }
                                 value={cantidad}
                                 onChange={(e) =>
                                     setCantidad(
-                                        Math.max(
-                                            1,
-                                            Number(e.target.value) || 1
+                                        Math.min(
+                                            typeof producto.stock === "number"
+                                                ? producto.stock
+                                                : Infinity,
+                                            Math.max(
+                                                1,
+                                                Number(e.target.value) || 1
+                                            )
                                         )
                                     )
                                 }
@@ -168,7 +186,11 @@ function Producto() {
                                 type="button"
                                 id="sumar"
                                 onClick={() =>
-                                    setCantidad((actual) => actual + 1)
+                                    setCantidad((actual) =>
+                                        typeof producto.stock === "number"
+                                            ? Math.min(actual + 1, producto.stock)
+                                            : actual + 1
+                                    )
                                 }
                             >
                                 +
@@ -184,6 +206,7 @@ function Producto() {
                             className="btn-agregar-carrito"
                             id="btn-agregar"
                             disabled={producto.stock === false}
+                            onClick={handleAgregarAlCarrito}
                         >
                             Agregar al carrito
                         </button>
@@ -197,6 +220,11 @@ function Producto() {
                         </button>
 
                     </div>
+                    {mensajeCarrito && (
+                        <p className="mensaje-agregar-carrito" role="status">
+                            {mensajeCarrito}
+                        </p>
+                    )}
 
                     <ul className="producto-beneficios">
                         <li>Envío gratis en compras sobre $50.000</li>

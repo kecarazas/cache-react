@@ -112,6 +112,21 @@
   text-decoration: none;
 }
 
+.producto-card-imagen > .producto-card-enlace {
+  display: contents;
+}
+
+.btn-cart-flotante:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.producto-card-mensaje {
+  margin-top: 6px;
+  color: #d6c7c2;
+  font-size: 0.75rem;
+}
+
 .producto-card-enlace:visited {
   color: inherit;
 }

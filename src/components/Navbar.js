@@ -2,10 +2,12 @@ import './Navbar.css'
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCarrito } from '../context/CarritoContext';
 
 function Navbar() {
     const [menuAbierto, setMenuAbierto] = useState(false);
     const {sesion, cerrarSesion} = useAuth();
+    const { cantidadTotal } = useCarrito();
     const navigate = useNavigate();
     const location = useLocation();
     const enCategoria = location.pathname.startsWith("/Categoria");
@@ -70,9 +72,19 @@ function Navbar() {
                 <input type="text" id="busqueda" name="q" placeholder="Mouse" />
                 </form>
             </div>
-                <Link to="/carrito" className="carrito-nav" aria-label="Ver carrito de compras">
+                <Link
+                    to="/carrito"
+                    className="carrito-nav"
+                    aria-label={
+                        cantidadTotal > 0
+                            ? `Ver carrito: ${cantidadTotal} ${cantidadTotal === 1 ? "producto" : "productos"}`
+                            : "Ver carrito de compras"
+                    }
+                >
                     <img src="images/carrito-de-compras.png" alt="Carrito de compras" />
-                    <span className="carrito-count oculto">0</span>
+                    <span className={`carrito-count ${cantidadTotal > 0 ? "" : "oculto"}`}>
+                        {cantidadTotal}
+                    </span>
                 </Link>
             <div className="auth-area" id="auth-area" />
                 {sesion ? (
