@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { validarDominioCorreo } from "../utils/validaciones";
-import './Auth.css'
+import { useAuth } from "../../context/AuthContext";
+import { validarDominioCorreo } from "../../utils/validaciones";
+import '../../styles/Auth.css'
 
 const cuentasDemo = [
   {

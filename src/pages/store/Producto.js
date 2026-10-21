@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { todosLosProductos } from "../data/productos";
-import "./Producto.css";
+import { todosLosProductos } from "../../data/productos";
+import "../../styles/Producto.css";
 
 function Producto() {
     const { slug } = useParams();

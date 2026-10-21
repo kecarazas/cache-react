@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
-import FiltroSidebar from "../components/FiltroSidebar";
-import ProductoGrid from "../components/ProductoGrid";
-import { todosLosProductos } from "../data/productos";
-import "./styles/Categoria.css";
+import FiltroSidebar from "../../components/FiltroSidebar";
+import ProductoGrid from "../../components/ProductoGrid";
+import { todosLosProductos } from "../../data/productos";
+import "../../styles/Categoria.css";
 
 function Categoria() {
   const { producto } = useParams();

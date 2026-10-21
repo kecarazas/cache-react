@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BLOGS } from "../data/blog";
-import "./Blog.css";
+import { BLOGS } from "../../data/blog";
+import "../../styles/Blog.css";
 
 function Blogs() {
     const [busqueda, setBusqueda] = useState("");

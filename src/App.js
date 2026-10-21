@@ -3,15 +3,15 @@ import './App.css';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 
-import Home from './pages/Home';
-import Categoria from './pages/Categoria';
-import Nosotros from './pages/Nosotros';
-import Login from './pages/Login';
-import Contacto from './pages/Contacto';
-import Producto from './pages/Producto';
-import Registro from './pages/Registro';
-import Blog from './pages/Blog';
-import BlogDetalle from './pages/BlogDetalle';
+import Home from './pages/store/Home';
+import Categoria from './pages/store/Categoria';
+import Nosotros from './pages/store/Nosotros';
+import Login from './pages/store/Login';
+import Contacto from './pages/store/Contacto';
+import Producto from './pages/store/Producto';
+import Registro from './pages/store/Registro';
+import Blog from './pages/store/Blog';
+import BlogDetalle from './pages/store/BlogDetalle';
 
 function App() {
   return (

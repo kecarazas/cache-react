@@ -1,7 +1,7 @@
 
 import { Link, useParams } from "react-router-dom";
-import { BLOGS } from "../data/blog";
-import "./Blog.css";
+import { BLOGS } from "../../data/blog";
+import "../../styles/Blog.css";
 
 function BlogDetalle() {
     const { id } = useParams();

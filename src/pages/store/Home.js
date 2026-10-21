@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import Slider from "../components/Slider";
-import "./Home.css"
+import Slider from "../../components/Slider";
+import "../../styles/Home.css"
 
 function Home() {
     return (

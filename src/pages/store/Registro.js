@@ -1,8 +1,8 @@
-import './Auth.css'
+import '../../styles/Auth.css'
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { regiones } from "../data/regiones";
-import { validarDominioCorreo, validarRun } from "../utils/validaciones";
+import { regiones } from "../../data/regiones";
+import { validarDominioCorreo, validarRun } from "../../utils/validaciones";
 
 const valoresIniciales = {
   run: "",
