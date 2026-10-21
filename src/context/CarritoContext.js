@@ -8,7 +8,7 @@ const COSTO_ENVIO = 2999;
 const ENVIO_GRATIS_DESDE = 20000;
 
 const CUPONES = {
-    ARTTOOLS10: {
+    CACHE10: {
         tipo: "porcentaje",
         valor: 10,
         texto: "10% de descuento"

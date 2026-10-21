@@ -1,12 +1,14 @@
 import './Navbar.css'
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
- 
+
 function Navbar() {
     const [menuAbierto, setMenuAbierto] = useState(false);
     const {sesion, cerrarSesion} = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const enCategoria = location.pathname.startsWith("/Categoria");
 
     const salir = () => {
         cerrarSesion();
@@ -19,7 +21,7 @@ function Navbar() {
             <div className="logo">
                 <Link to="/">
                     <img src="images/Cachelogo.png" alt="logo" />
-                    <h1>Cache - Tools</h1>
+                    <h1>Caché</h1>
                 </Link>
             </div>
             <div className="acciones-cabecera">
@@ -40,17 +42,21 @@ function Navbar() {
             <ul className="menu">
                 <li><Link to="/" className="activo" aria-current="page">Inicio</Link></li>
                 <li className="menu-categorias">
-                <details>
-                    <summary>Categorías</summary>
-                    <ul className="submenu">
-                    <li><Link to="/Categoria/mouse">Mouses</Link></li>
-                    <li><Link to="/Categoria/mousepad">Mousepads</Link></li>
-                    <li><Link to="/Categoria/teclado">Teclados</Link></li>
-                    <li><Link to="/Categoria/skate">Skates</Link></li>
-                    <li><Link to="/Categoria/audifonos">Audífonos</Link></li>
-                    <li><Link to="/Categoria/mangas">Mangas</Link></li>
-                    </ul>
-                </details>
+                    <li className="menu-categorias">
+                        <details>
+                            <summary className={enCategoria ? "activo" : ""}>
+                            Categorías
+                            </summary>
+                            <ul className="submenu">
+                            <li><Link to="/Categoria/mouse">Mouses</Link></li>
+                            <li><Link to="/Categoria/mousepad">Mousepads</Link></li>
+                            <li><Link to="/Categoria/teclado">Teclados</Link></li>
+                            <li><Link to="/Categoria/skate">Skates</Link></li>
+                            <li><Link to="/Categoria/audifonos">Audífonos</Link></li>
+                            <li><Link to="/Categoria/mangas">Mangas</Link></li>
+                            </ul>
+                        </details>
+                    </li>  
                 </li>
                 <li><Link to="/Categoria">Productos</Link></li>
                 <li><Link to="/Blogs">Blogs</Link></li>
