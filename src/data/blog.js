@@ -78,7 +78,7 @@ export const BLOGS = [
     {
         id: 6,
         titulo: "Consejos para cuidar tus periféricos",
-        imagen: "/images/blog/cuidado-perifericos.jpg",
+        imagen: "/images/blog/cuidado-perifericos.webp",
         fecha: "20 de octubre, 2026",
         categoria: "Mantenimiento",
         resumen:
