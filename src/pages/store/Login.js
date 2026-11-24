@@ -1,27 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { validarDominioCorreo } from "../../utils/validaciones";
+import { mensajeDeError } from "../../services/api";
 import '../../styles/Auth.css'
-
-const cuentasDemo = [
-  {
-    run: "111111111",
-    nombre: "Admin",
-    apellidos: "Art Tools",
-    correo: "admin@duoc.cl",
-    clave: "admin123",
-    tipoUsuario: "administrador"
-  },
-  {
-    run: "222222222",
-    nombre: "Vendedor",
-    apellidos: "Art Tools",
-    correo: "vendedor@duoc.cl",
-    clave: "vendedor123",
-    tipoUsuario: "vendedor"
-  }
-];
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
@@ -40,8 +21,6 @@ export default function Login() {
       error = "El correo es obligatorio.";
     } else if (valor.trim().length > 100) {
       error = "Máximo 100 caracteres.";
-    } else if (!validarDominioCorreo(valor.trim())) {
-      error = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
     }
 
     setErrores((prev) => ({ ...prev, correo: error }));
@@ -53,8 +32,6 @@ export default function Login() {
 
     if (!valor) {
       error = "La contraseña es obligatoria.";
-    } else if (valor.length < 4 || valor.length > 10) {
-      error = "Debe tener entre 4 y 10 caracteres.";
     }
 
     setErrores((prev) => ({ ...prev, clave: error }));
@@ -89,24 +66,7 @@ export default function Login() {
     validarClave();
   };
 
-  const obtenerUsuarioPorCorreo = (correoBuscado) => {
-    let usuarios = [];
-
-    try {
-      usuarios = JSON.parse(localStorage.getItem("at_usuarios")) || [];
-    } catch {
-      usuarios = [];
-    }
-
-    const todos = [...cuentasDemo, ...usuarios];
-
-    return todos.find(
-      (usuario) =>
-        usuario.correo.toLowerCase() === correoBuscado.trim().toLowerCase()
-    );
-  };
-
-  const handleSubmit = (evento) => {
+  const handleSubmit = async (evento) => {
     evento.preventDefault();
 
     setCamposTocados({ correo: true, clave: true });
@@ -122,29 +82,22 @@ export default function Login() {
       return;
     }
 
-    const usuario = obtenerUsuarioPorCorreo(correo);
+    try {
+      const usuario = await iniciarSesion(correo.trim(), clave);
 
-    if (!usuario || usuario.clave !== clave) {
+      setAlerta({
+        tipo: "exito",
+        mensaje: `¡Bienvenido/a, ${usuario.nombre}! Redirigiendo...`
+      });
+
+      navigate(usuario.tipoUsuario === "cliente" ? "/" : "/admin", { replace: true });
+    } catch (e) {
       setAlerta({
         tipo: "error",
-        mensaje: "Correo o contraseña incorrectos."
+        mensaje: e.response?.status === 401 || e.response?.status === 400
+          ? "Correo o contraseña incorrectos."
+          : mensajeDeError(e)
       });
-      return;
-    }
-
-    iniciarSesion(usuario);
-
-    setAlerta({
-      tipo: "exito",
-      mensaje: `¡Bienvenido/a, ${usuario.nombre}! Redirigiendo...`
-    });
-
-    if (usuario.tipoUsuario === "administrador") {
-      navigate("/admin", { replace: true });
-    } else if (usuario.tipoUsuario === "vendedor") {
-      navigate("/admin", { replace: true });
-    } else {
-      navigate("/", { replace: true });
     }
   };
 
@@ -157,9 +110,10 @@ export default function Login() {
         </div>
 
         <div className="demo-credenciales">
-          <strong>Cuentas de demostración (mientras no hay backend):</strong>
-          Administrador: admin@duoc.cl / admin123 &nbsp;|&nbsp;
-          Vendedor: vendedor@duoc.cl / vendedor123
+          <strong>Cuentas de prueba:</strong>
+          Administrador: admin@cache.cl / admin123 &nbsp;|&nbsp;
+          Vendedor: vendedor@cache.cl / vendedor123 &nbsp;|&nbsp;
+          Cliente: pedro@gmail.com / pedro123
         </div>
 
         <form className="form-card form-login" onSubmit={handleSubmit} noValidate>
@@ -180,7 +134,7 @@ export default function Login() {
               type="email"
               value={correo}
               maxLength={100}
-              placeholder="john.doe@duocuc.cl"
+              placeholder="correo@ejemplo.cl"
               onChange={handleCorreo}
               onBlur={handleBlurCorreo}
             />
@@ -198,8 +152,7 @@ export default function Login() {
               name="clave"
               type="password"
               value={clave}
-              maxLength={10}
-              placeholder="Entre 4 y 10 caracteres"
+              placeholder="Tu contraseña"
               onChange={handleClave}
               onBlur={handleBlurClave}
             />

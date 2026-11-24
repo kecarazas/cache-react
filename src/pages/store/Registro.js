@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { regiones } from "../../data/regiones";
 import { validarDominioCorreo, validarRun } from "../../utils/validaciones";
+import { authService } from "../../services";
+import { mensajeDeError } from "../../services/api";
 
 const valoresIniciales = {
   run: "",
@@ -141,38 +143,7 @@ export default function Registro() {
     validarCampo(name);
   };
 
-  const obtenerUsuarios = () => {
-    try {
-      return JSON.parse(localStorage.getItem("at_usuarios")) || [];
-    } catch {
-      return [];
-    }
-  };
-
-  const crearUsuario = (usuario) => {
-    const usuarios = obtenerUsuarios();
-
-    const existeRun = usuarios.some(
-      (item) => item.run.toUpperCase() === usuario.run.toUpperCase()
-    );
-
-    const existeCorreo = usuarios.some(
-      (item) => item.correo.toLowerCase() === usuario.correo.toLowerCase()
-    );
-
-    if (existeRun) {
-      return { ok: false, error: "Ya existe una cuenta con este RUN." };
-    }
-
-    if (existeCorreo) {
-      return { ok: false, error: "Ya existe una cuenta con este correo." };
-    }
-
-    localStorage.setItem("at_usuarios", JSON.stringify([...usuarios, usuario]));
-    return { ok: true };
-  };
-
-  const handleSubmit = (evento) => {
+  const handleSubmit = async (evento) => {
     evento.preventDefault();
 
     let formValido = true;
@@ -206,24 +177,23 @@ export default function Registro() {
       return;
     }
 
-    const resultado = crearUsuario({
-      run: valores.run.trim().toUpperCase(),
-      nombre: valores.nombre.trim(),
-      apellidos: valores.apellidos.trim(),
-      correo: valores.correo.trim().toLowerCase(),
-      clave: valores.clave,
-      telefono: valores.telefono.trim(),
-      fechaNacimiento: valores.fechaNacimiento,
-      tipoUsuario: "cliente",
-      region: valores.region,
-      comuna: valores.comuna,
-      direccion: valores.direccion.trim()
-    });
-
-    if (!resultado.ok) {
+    try {
+      await authService.registro({
+        run: valores.run.trim().toUpperCase(),
+        nombre: valores.nombre.trim(),
+        apellidos: valores.apellidos.trim(),
+        correo: valores.correo.trim().toLowerCase(),
+        clave: valores.clave,
+        telefono: valores.telefono.trim(),
+        fechaNacimiento: valores.fechaNacimiento || undefined,
+        region: valores.region,
+        comuna: valores.comuna,
+        direccion: valores.direccion.trim()
+      });
+    } catch (e) {
       setAlerta({
         tipo: "error",
-        mensaje: resultado.error
+        mensaje: mensajeDeError(e)
       });
       return;
     }
