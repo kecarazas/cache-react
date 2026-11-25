@@ -5,11 +5,12 @@ import {
   useState
 } from "react";
 
-import { todosLosProductos } from "../data/productos";
+import { useProductos } from "./ProductosContext";
+import { pedidoService } from "../services";
+import { mensajeDeError } from "../services/api";
 
 const CLAVE_CARRITO = "at_carrito";
 const CLAVE_CUPON = "at_cupon";
-const CLAVE_PEDIDOS = "at_pedidos";
 
 const COSTO_ENVIO = 2990;
 const ENVIO_GRATIS_DESDE = 20000;
@@ -28,12 +29,6 @@ const CUPONES = {
 };
 
 const CarritoContext = createContext(null);
-
-function buscarProducto(slug) {
-  return todosLosProductos.find(
-    (producto) => producto.slug === slug
-  );
-}
 
 function obtenerLimiteStock(producto) {
   if (typeof producto.stock === "number") {
@@ -56,32 +51,18 @@ function cargarCarrito() {
     const itemsValidos = [];
 
     for (const item of guardado) {
-      if (!item) continue;
+      if (!item || typeof item.slug !== "string") continue;
       if (!Number.isInteger(item.cantidad)) continue;
       if (item.cantidad < 1) continue;
 
-      const producto = buscarProducto(item.slug);
-
-      if (!producto) continue;
-
-      const limite = obtenerLimiteStock(producto);
-
-      if (limite === 0) continue;
-
       const existente = itemsValidos.find(
-        (elemento) => elemento.slug === producto.slug
+        (elemento) => elemento.slug === item.slug
       );
 
       if (existente) {
-        existente.cantidad = Math.min(
-          existente.cantidad + item.cantidad,
-          limite
-        );
+        existente.cantidad += item.cantidad;
       } else {
-        itemsValidos.push({
-          slug: producto.slug,
-          cantidad: Math.min(item.cantidad, limite)
-        });
+        itemsValidos.push({ slug: item.slug, cantidad: item.cantidad });
       }
     }
 
@@ -104,8 +85,35 @@ function cargarCupon() {
 }
 
 export function CarritoProvider({ children }) {
+  const { productos, cargando, error, recargar } = useProductos();
   const [items, setItems] = useState(cargarCarrito);
   const [cupon, setCupon] = useState(cargarCupon);
+
+  const buscarProducto = (slug) =>
+    productos.find((producto) => producto.slug === slug);
+
+  // Cuando llega el catálogo del backend, descarta lo que ya no existe o no tiene stock
+  useEffect(() => {
+    if (cargando || error) return;
+
+    setItems((anteriores) => {
+      const ajustados = anteriores.flatMap((item) => {
+        const producto = productos.find((p) => p.slug === item.slug);
+        if (!producto) return [];
+
+        const limite = obtenerLimiteStock(producto);
+        if (limite === 0) return [];
+
+        return [{ slug: item.slug, cantidad: Math.min(item.cantidad, limite) }];
+      });
+
+      const igual =
+        ajustados.length === anteriores.length &&
+        ajustados.every((item, i) => item.cantidad === anteriores[i].cantidad);
+
+      return igual ? anteriores : ajustados;
+    });
+  }, [productos, cargando, error]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -238,141 +246,38 @@ export function CarritoProvider({ children }) {
     setItems([]);
   }
 
-  function confirmarCompra(datosCliente) {
-    if (items.length === 0 || productosCarrito.length === 0) {
+  // El backend vuelve a calcular precios, cupón, envío y stock: aquí solo se envía qué y cuánto
+  async function confirmarCompra(datosCliente) {
+    if (productosCarrito.length === 0) {
       return {
         ok: false,
         mensaje: "No se pudo realizar la compra porque el carrito está vacío."
       };
     }
 
-    const camposObligatorios = [
-      "nombre",
-      "correo",
-      "telefono",
-      "region",
-      "comuna",
-      "direccion"
-    ];
-
-    if (
-      !datosCliente ||
-      camposObligatorios.some(
-        (campo) =>
-          typeof datosCliente[campo] !== "string" ||
-          !datosCliente[campo].trim()
-      ) ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datosCliente.correo.trim()) ||
-      !/^[0-9+ ()-]{8,20}$/.test(datosCliente.telefono.trim())
-    ) {
-      return {
-        ok: false,
-        mensaje: "No se pudo realizar la compra. Revisa el correo, teléfono y datos de entrega."
-      };
-    }
-
-    const productoNoDisponible = productosCarrito.find((producto) => {
-      const limite = obtenerLimiteStock(producto);
-      return producto.cantidad < 1 || producto.cantidad > limite;
-    });
-
-    if (productoNoDisponible) {
-      return {
-        ok: false,
-        mensaje: `No se pudo realizar la compra. Revisa el stock de ${productoNoDisponible.nombre}.`
-      };
-    }
-
-    const ahora = new Date();
-    const pedido = {
-      id: `PED-${ahora.getTime()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-      fecha: ahora.toISOString(),
-      estado: "recibido",
-      cliente: Object.fromEntries(
-        camposObligatorios.map((campo) => [
-          campo,
-          datosCliente[campo].trim()
-        ])
-      ),
-      productos: productosCarrito.map((producto) => ({
-        slug: producto.slug,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        cantidad: producto.cantidad,
-        subtotal: producto.subtotal
-      })),
-      totales: { ...totales }
-    };
-
-    let valoresAnteriores;
-
     try {
-      valoresAnteriores = {
-        pedidos: localStorage.getItem(CLAVE_PEDIDOS),
-        carrito: localStorage.getItem(CLAVE_CARRITO),
-        cupon: localStorage.getItem(CLAVE_CUPON)
-      };
+      const pedido = await pedidoService.comprar({
+        nombre: datosCliente.nombre.trim(),
+        correo: datosCliente.correo.trim(),
+        telefono: datosCliente.telefono.trim(),
+        region: datosCliente.region.trim(),
+        comuna: datosCliente.comuna.trim(),
+        direccion: datosCliente.direccion.trim(),
+        cupon: cupon || undefined,
+        items: productosCarrito.map((producto) => ({
+          slug: producto.slug,
+          cantidad: producto.cantidad
+        }))
+      });
 
-      const pedidosGuardados = valoresAnteriores.pedidos
-        ? JSON.parse(valoresAnteriores.pedidos)
-        : [];
+      setItems([]);
+      setCupon(null);
+      recargar(); // refresca el stock
 
-      if (!Array.isArray(pedidosGuardados)) {
-        throw new Error("El historial de pedidos no es válido.");
-      }
-
-      localStorage.setItem(
-        CLAVE_PEDIDOS,
-        JSON.stringify([...pedidosGuardados, pedido])
-      );
-      localStorage.setItem(CLAVE_CARRITO, "[]");
-      localStorage.removeItem(CLAVE_CUPON);
-    } catch (error) {
-      if (valoresAnteriores) {
-        try {
-          if (valoresAnteriores.pedidos === null) {
-            localStorage.removeItem(CLAVE_PEDIDOS);
-          } else {
-            localStorage.setItem(
-              CLAVE_PEDIDOS,
-              valoresAnteriores.pedidos
-            );
-          }
-          if (valoresAnteriores.carrito === null) {
-            localStorage.removeItem(CLAVE_CARRITO);
-          } else {
-            localStorage.setItem(
-              CLAVE_CARRITO,
-              valoresAnteriores.carrito
-            );
-          }
-          if (valoresAnteriores.cupon === null) {
-            localStorage.removeItem(CLAVE_CUPON);
-          } else {
-            localStorage.setItem(CLAVE_CUPON, valoresAnteriores.cupon);
-          }
-        } catch (errorRestauracion) {
-          console.error(
-            "No se pudo restaurar el carrito tras fallar el checkout.",
-            errorRestauracion
-          );
-        }
-      }
-
-      console.error("No se pudo guardar el pedido.", error);
-      return {
-        ok: false,
-        mensaje: "No se pudo realizar la compra. Inténtalo nuevamente."
-      };
+      return { ok: true, pedido };
+    } catch (e) {
+      return { ok: false, mensaje: mensajeDeError(e) };
     }
-
-    setItems([]);
-    setCupon(null);
-
-    return {
-      ok: true,
-      pedido
-    };
   }
 
   function aplicarCupon(codigoIngresado) {
@@ -419,7 +324,7 @@ export function CarritoProvider({ children }) {
       {
         ...producto,
         cantidad: item.cantidad,
-        subtotal: producto.precio * item.cantidad
+        subtotal: (producto.precioFinal ?? producto.precio) * item.cantidad
       }
     ];
   });

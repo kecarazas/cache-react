@@ -44,6 +44,7 @@ export default function Carrito() {
 
   const [errorCheckout, setErrorCheckout] = useState("");
   const [pedidoConfirmado, setPedidoConfirmado] = useState(null);
+  const [enviando, setEnviando] = useState(false);
 
   function handleAplicarCupon() {
     const resultado = aplicarCupon(codigoCupon);
@@ -64,7 +65,7 @@ export default function Carrito() {
     }));
   }
 
-  function handleFinalizarCompra(evento) {
+  async function handleFinalizarCompra(evento) {
     evento.preventDefault();
 
     const formulario = evento.currentTarget;
@@ -77,7 +78,10 @@ export default function Carrito() {
       return;
     }
 
-    const resultado = confirmarCompra(datosCliente);
+    setEnviando(true);
+    const resultado = await confirmarCompra(datosCliente);
+    setEnviando(false);
+
     if (!resultado.ok) {
       setErrorCheckout(resultado.mensaje);
       return;
@@ -107,8 +111,8 @@ export default function Carrito() {
           {pedidoConfirmado ? (
             <div className="checkout-confirmacion" role="status">
               <h3>¡Pedido recibido!</h3>
-              <p>Tu compra de demostración se registró correctamente.</p>
-              <p>Número de pedido: <strong>{pedidoConfirmado.id}</strong></p>
+              <p>Tu compra se registró correctamente.</p>
+              <p>Número de pedido: <strong>{pedidoConfirmado.codigo}</strong></p>
               <Link to="/">Seguir comprando</Link>
             </div>
           ) : (
@@ -129,8 +133,8 @@ export default function Carrito() {
                       </p>
                     )}
                     <p className="checkout-pago-nota">
-                      Checkout de demostración: el pedido se guarda localmente y no
-                      se procesa ningún pago.
+                      Checkout de demostración: el pedido se guarda en el servidor
+                      y no se procesa ningún pago.
                     </p>
 
                     <div className="checkout-campos">
@@ -254,7 +258,7 @@ export default function Carrito() {
                           <h3>{producto.nombre}</h3>
 
                           <p className="precio">
-                            {formatCLP(producto.precio)} c/u
+                            {formatCLP(producto.precioFinal ?? producto.precio)} c/u
                           </p>
 
                           <div className="cantidad">
@@ -377,9 +381,9 @@ export default function Carrito() {
                 type="submit"
                 form="checkout-form"
                 className="finalizar"
-                disabled={productosCarrito.length === 0}
+                disabled={productosCarrito.length === 0 || enviando}
               >
-                Confirmar compra
+                {enviando ? "Procesando…" : "Confirmar compra"}
               </button>
             ) : (
               <button
