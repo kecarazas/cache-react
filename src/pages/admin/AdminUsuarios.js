@@ -1,18 +1,32 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
-import {
-  obtenerUsuarios,
-  eliminarUsuario,
-} from "../../data/admin";
+import { usuarioService } from "../../services";
+import { mensajeDeError } from "../../services/api";
 
 import "../../styles/admin/Admin.css";
 
 export default function AdminUsuarios() {
   const { sesion } = useAuth();
 
-  const [usuarios, setUsuarios] = useState(() => obtenerUsuarios());
+  const [usuarios, setUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+
+  const cargar = useCallback(() => {
+    return usuarioService
+      .listar()
+      .then((lista) => {
+        setUsuarios(lista);
+        setError("");
+      })
+      .catch((e) => setError(mensajeDeError(e)))
+      .finally(() => setCargando(false));
+  }, []);
+
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
   const [busqueda, setBusqueda] = useState("");
 
   const filtrados = useMemo(() => {
@@ -27,8 +41,8 @@ export default function AdminUsuarios() {
     );
   }, [usuarios, busqueda]);
 
-  function eliminar(correo) {
-    if (correo === sesion?.correo) {
+  async function eliminar(usuario) {
+    if (usuario.correo === sesion?.correo) {
       window.alert("No puedes eliminar tu propia cuenta.");
       return;
     }
@@ -39,8 +53,12 @@ export default function AdminUsuarios() {
 
     if (!confirmar) return;
 
-    eliminarUsuario(correo);
-    setUsuarios(obtenerUsuarios());
+    try {
+      await usuarioService.eliminar(usuario.id);
+      await cargar();
+    } catch (e) {
+      window.alert(mensajeDeError(e));
+    }
   }
 
   return (
@@ -71,6 +89,10 @@ export default function AdminUsuarios() {
           </Link>
         </div>
 
+        {error && (
+          <p className="mensaje-error" role="alert">{error}</p>
+        )}
+
         <div style={{ overflowX: "auto" }}>
           <table className="admin-tabla">
             <thead>
@@ -88,12 +110,12 @@ export default function AdminUsuarios() {
               {filtrados.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="tabla-vacia">
-                    No se encontraron usuarios.
+                    {cargando ? "Cargando usuarios…" : "No se encontraron usuarios."}
                   </td>
                 </tr>
               ) : (
                 filtrados.map((u) => (
-                  <tr key={u.run}>
+                  <tr key={u.id}>
                     <td>{u.run}</td>
 
                     <td>
@@ -132,7 +154,7 @@ export default function AdminUsuarios() {
                               ? "No puedes eliminar tu propia cuenta"
                               : "Eliminar usuario"
                           }
-                          onClick={() => eliminar(u.correo)}
+                          onClick={() => eliminar(u)}
                         >
                           Eliminar
                         </button>

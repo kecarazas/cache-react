@@ -3,12 +3,10 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import {
-  obtenerProductos,
-  eliminarProducto,
-  nombreCategoria,
-  formatCLP,
-} from "../../data/admin";
+import { formatCLP } from "../../data/admin";
+import { useProductos } from "../../context/ProductosContext";
+import { productoService } from "../../services";
+import { mensajeDeError } from "../../services/api";
 
 import "../../styles/admin/Admin.css";
 
@@ -18,7 +16,7 @@ function MiniaturaProducto({ producto }) {
   const imagenOriginal = producto.imagen
     ? producto.imagen.startsWith("http") || producto.imagen.startsWith("/")
       ? producto.imagen
-      : `/${producto.imagen.replace(/^\.?\//, "")}`
+      : `/images/${producto.imagen.replace(/^\.?\//, "")}`
     : IMAGEN_PLACEHOLDER;
 
   const [imagen, setImagen] = useState(imagenOriginal);
@@ -58,7 +56,7 @@ function MiniaturaProducto({ producto }) {
 export default function AdminProductos() {
   const { sesion } = useAuth();
 
-  const [productos, setProductos] = useState(() => obtenerProductos());
+  const { productos, cargando, error, recargar } = useProductos();
   const [busqueda, setBusqueda] = useState("");
 
   const esAdmin = sesion?.tipoUsuario === "administrador";
@@ -73,7 +71,7 @@ export default function AdminProductos() {
     );
   }, [productos, busqueda]);
 
-  function eliminar(codigo) {
+  async function eliminar(producto) {
     if (!esAdmin) return;
 
     const confirmar = window.confirm(
@@ -82,8 +80,12 @@ export default function AdminProductos() {
 
     if (!confirmar) return;
 
-    eliminarProducto(codigo);
-    setProductos(obtenerProductos());
+    try {
+      await productoService.eliminar(producto.id);
+      await recargar();
+    } catch (e) {
+      window.alert(mensajeDeError(e));
+    }
   }
 
   return (
@@ -113,6 +115,10 @@ export default function AdminProductos() {
           )}
         </div>
 
+        {error && (
+          <p className="mensaje-error" role="alert">{error}</p>
+        )}
+
         <div className="tabla-scroll">
           <table className="admin-tabla">
             <thead>
@@ -131,7 +137,7 @@ export default function AdminProductos() {
               {filtrados.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="tabla-vacia">
-                    No se encontraron productos.
+                    {cargando ? "Cargando productos…" : "No se encontraron productos."}
                   </td>
                 </tr>
               ) : (
@@ -141,15 +147,15 @@ export default function AdminProductos() {
                     Number(p.stock) <= Number(p.stockCritico);
 
                   return (
-                    <tr key={p.codigo}>
+                    <tr key={p.id}>
                       <td>
                         <MiniaturaProducto producto={p} />
                       </td>
 
                       <td>{p.codigo}</td>
                       <td>{p.nombre}</td>
-                      <td>{nombreCategoria(p.categoria)}</td>
-                      <td>{formatCLP(p.precio)}</td>
+                      <td>{p.categoriaNombre}</td>
+                      <td>{formatCLP(p.precioFinal ?? p.precio)}</td>
 
                       <td className={stockBajo ? "stock-bajo" : ""}>
                         {p.stock}
@@ -171,7 +177,7 @@ export default function AdminProductos() {
                             <button
                               type="button"
                               className="accion-eliminar"
-                              onClick={() => eliminar(p.codigo)}
+                              onClick={() => eliminar(p)}
                             >
                               Eliminar
                             </button>

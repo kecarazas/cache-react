@@ -1,23 +1,29 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-
-import {
-  obtenerProductos,
-  obtenerUsuarios,
-} from "../../data/admin";
+import { useProductos } from "../../context/ProductosContext";
+import { usuarioService } from "../../services";
 
 import "../../styles/admin/Admin.css";
 
 export default function AdminDashboard() {
   const { sesion } = useAuth();
 
-  const productos = useMemo(() => obtenerProductos(), []);
-  const usuarios = useMemo(() => obtenerUsuarios(), []);
+  const { productos } = useProductos();
+  const [totalUsuarios, setTotalUsuarios] = useState(0);
+
+  const esAdmin = sesion?.tipoUsuario === "administrador";
+
+  // Solo el administrador puede listar usuarios
+  useEffect(() => {
+    if (!esAdmin) return;
+    usuarioService
+      .listar()
+      .then((lista) => setTotalUsuarios(lista.length))
+      .catch(() => setTotalUsuarios(0));
+  }, [esAdmin]);
 
   const stockCritico = productos.filter(
-    (p) =>
-      p.stockCritico != null &&
-      Number(p.stock) <= Number(p.stockCritico)
+    (p) => p.critico
   );
 
   return (
@@ -43,9 +49,9 @@ export default function AdminDashboard() {
           </div>
         </article>
 
-        {sesion?.tipoUsuario === "administrador" && (
+        {esAdmin && (
           <article className="admin-card">
-            <div className="valor">{usuarios.length}</div>
+            <div className="valor">{totalUsuarios}</div>
             <div className="etiqueta">Usuarios registrados</div>
           </article>
         )}
@@ -61,7 +67,7 @@ export default function AdminDashboard() {
         ) : (
           <ul>
             {stockCritico.map((p) => (
-              <li key={p.codigo}>
+              <li key={p.id}>
                 {p.nombre} — quedan{" "}
                 <strong>{p.stock}</strong> unidades
                 {" "}(código {p.codigo})

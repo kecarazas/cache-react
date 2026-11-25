@@ -1,13 +1,10 @@
 
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
-import {
-  obtenerSesion,
-  obtenerUsuarioPorCorreo,
-  obtenerUsuarioPorRun,
-  crearUsuario,
-  actualizarUsuario,
-} from "../../data/admin";
+import { useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { usuarioService } from "../../services";
+import { mensajeDeError } from "../../services/api";
 import "../../styles/admin/Admin.css";
 
 const REGIONES = [
@@ -49,7 +46,7 @@ function validarRun(run) {
 }
 
 function correoValido(correo) {
-  return /^[^\s@]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i.test(correo);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 }
 
 const FORM_VACIO = {
@@ -66,12 +63,48 @@ const FORM_VACIO = {
   confirmarClave: "",
 };
 
+// Carga la lista del backend para poder editar un usuario por su correo
 export default function AdminUsuarioForm() {
-  const sesion = obtenerSesion();
   const { correo } = useParams();
-  const navigate = useNavigate();
   const correoOriginal = correo ? decodeURIComponent(correo) : null;
-  const original = correoOriginal ? obtenerUsuarioPorCorreo(correoOriginal) : null;
+  const [estado, setEstado] = useState({ cargando: !!correoOriginal, original: null, error: "" });
+
+  useEffect(() => {
+    if (!correoOriginal) return;
+    usuarioService
+      .listar()
+      .then((lista) => {
+        const original =
+          lista.find((u) => u.correo.toLowerCase() === correoOriginal.toLowerCase()) || null;
+        setEstado({ cargando: false, original, error: "" });
+      })
+      .catch((e) => setEstado({ cargando: false, original: null, error: mensajeDeError(e) }));
+  }, [correoOriginal]);
+
+  if (estado.cargando) {
+    return (
+      <main className="admin-main">
+        <p>Cargando…</p>
+      </main>
+    );
+  }
+
+  if (correoOriginal && !estado.original) {
+    return (
+      <main className="admin-main">
+        <h2>Usuario no encontrado</h2>
+        {estado.error && <p className="mensaje-error">{estado.error}</p>}
+        <Link to="/admin/usuarios">Volver a usuarios</Link>
+      </main>
+    );
+  }
+
+  return <FormularioUsuario key={estado.original?.id ?? "nuevo"} original={estado.original} />;
+}
+
+function FormularioUsuario({ original }) {
+  const { sesion } = useAuth();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState(() => {
     if (!original) return { ...FORM_VACIO };
@@ -89,15 +122,6 @@ export default function AdminUsuarioForm() {
     return <Navigate to="/admin" replace />;
   }
 
-  if (correoOriginal && !original) {
-    return (
-      <main className="admin-main">
-        <h2>Usuario no encontrado</h2>
-        <Link to="/admin/usuarios">Volver a usuarios</Link>
-      </main>
-    );
-  }
-
   const comunas = REGIONES.find((r) => r.nombre === form.region)?.comunas || [];
 
   function cambiar(e) {
@@ -109,7 +133,7 @@ export default function AdminUsuarioForm() {
     }));
   }
 
-  function guardar(e) {
+  async function guardar(e) {
     e.preventDefault();
     const nuevos = {};
     const run = form.run.trim().toUpperCase();
@@ -119,12 +143,7 @@ export default function AdminUsuarioForm() {
 
     if (!run) nuevos.run = "El RUN es obligatorio.";
     else if (!validarRun(run)) nuevos.run = "El RUN no es válido.";
-    else {
-      const repetido = obtenerUsuarioPorRun(run);
-      if (repetido && (!original || repetido.run !== original.run)) {
-        nuevos.run = "Ya existe un usuario con ese RUN.";
-      }
-    }
+
 
     if (!nombre) nuevos.nombre = "El nombre es obligatorio.";
     else if (nombre.length > 50) nuevos.nombre = "Máximo 50 caracteres.";
@@ -134,12 +153,7 @@ export default function AdminUsuarioForm() {
 
     if (!correoLimpio) nuevos.correo = "El correo es obligatorio.";
     else if (!correoValido(correoLimpio)) {
-      nuevos.correo = "Usa @duoc.cl, @profesor.duoc.cl o @gmail.com.";
-    } else {
-      const repetido = obtenerUsuarioPorCorreo(correoLimpio);
-      if (repetido && (!original || repetido.correo.toLowerCase() !== original.correo.toLowerCase())) {
-        nuevos.correo = "Ya existe una cuenta con ese correo.";
-      }
+      nuevos.correo = "El correo no tiene un formato válido.";
     }
 
     if (!form.tipoUsuario) nuevos.tipoUsuario = "Selecciona un tipo de usuario.";
@@ -168,29 +182,26 @@ export default function AdminUsuarioForm() {
       nombre,
       apellidos,
       correo: correoLimpio,
-      clave: form.clave || original?.clave || "",
-      fechaNacimiento: form.fechaNacimiento,
+      clave: form.clave || undefined, // vacía al editar = el backend conserva la actual
+      fechaNacimiento: form.fechaNacimiento || undefined,
       tipoUsuario: form.tipoUsuario,
+      telefono: original?.telefono || "",
       region: form.region,
       comuna: form.comuna,
       direccion: form.direccion.trim(),
+      departamento: original?.departamento || undefined,
     };
 
-    if (original) {
-      const ok = actualizarUsuario(original.correo, usuario);
-      if (!ok) {
-        setAlerta("No se pudo actualizar el usuario. Revisa el correo.");
-        return;
+    try {
+      if (original) {
+        await usuarioService.actualizar(original.id, usuario);
+      } else {
+        await usuarioService.crear(usuario);
       }
-    } else {
-      const resultado = crearUsuario(usuario);
-      if (!resultado.ok) {
-        setAlerta(resultado.error);
-        return;
-      }
+      navigate("/admin/usuarios");
+    } catch (err) {
+      setAlerta(mensajeDeError(err));
     }
-
-    navigate("/admin/usuarios");
   }
 
   function campoError(nombre) {

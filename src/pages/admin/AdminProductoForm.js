@@ -1,20 +1,50 @@
 
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  CATEGORIAS,
-  obtenerProductoPorCodigo,
-  crearProducto,
-  actualizarProducto,
-} from "../../data/admin";
+import { useProductos } from "../../context/ProductosContext";
+import { productoService } from "../../services";
+import { mensajeDeError } from "../../services/api";
 import "../../styles/admin/Admin.css";
 
+// Espera a que el catálogo cargue antes de mostrar el formulario (para poder editar)
 export default function AdminProductoForm() {
   const { codigo } = useParams();
-  const navigate = useNavigate();
+  const { productos, categorias, cargando, recargar } = useProductos();
+
+  if (cargando) {
+    return (
+      <main className="admin-main">
+        <p>Cargando…</p>
+      </main>
+    );
+  }
+
   const original = codigo
-    ? obtenerProductoPorCodigo(decodeURIComponent(codigo))
+    ? productos.find((p) => p.codigo === decodeURIComponent(codigo)) || null
     : null;
+
+  if (codigo && !original) {
+    return (
+      <main className="admin-main">
+        <h2>Producto no encontrado</h2>
+        <Link to="/admin/productos">Volver a productos</Link>
+      </main>
+    );
+  }
+
+  return (
+    <FormularioProducto
+      key={original?.id ?? "nuevo"}
+      original={original}
+      productos={productos}
+      categorias={categorias}
+      recargar={recargar}
+    />
+  );
+}
+
+function FormularioProducto({ original, productos, categorias, recargar }) {
+  const navigate = useNavigate();
 
   const [form, setForm] = useState(() => ({
     codigo: original?.codigo || "",
@@ -34,15 +64,17 @@ export default function AdminProductoForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function guardar(e) {
+  async function guardar(e) {
     e.preventDefault();
     const nuevosErrores = {};
 
     if (!form.codigo.trim()) nuevosErrores.codigo = "El código es obligatorio.";
-    else if (form.codigo.trim().length < 3) nuevosErrores.codigo = "Mínimo 3 caracteres.";
+    else if (form.codigo.trim().length < 3 || form.codigo.trim().length > 10) {
+      nuevosErrores.codigo = "Debe tener entre 3 y 10 caracteres.";
+    }
 
     if (!form.nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio.";
-    if (form.nombre.length > 100) nuevosErrores.nombre = "Máximo 100 caracteres.";
+    if (form.nombre.length > 150) nuevosErrores.nombre = "Máximo 150 caracteres.";
     if (form.descripcion.length > 500) nuevosErrores.descripcion = "Máximo 500 caracteres.";
 
     if (form.precio === "" || !Number.isFinite(Number(form.precio)) || Number(form.precio) < 0) {
@@ -60,7 +92,9 @@ export default function AdminProductoForm() {
     if (!form.categoria) nuevosErrores.categoria = "Selecciona una categoría.";
 
     const codigoFinal = form.codigo.trim();
-    const codigoExistente = obtenerProductoPorCodigo(codigoFinal);
+    const codigoExistente = productos.find(
+      (p) => p.codigo.toLowerCase() === codigoFinal.toLowerCase()
+    );
 
     if (
       !original &&
@@ -75,36 +109,34 @@ export default function AdminProductoForm() {
       return;
     }
 
+    // Campos que este formulario no edita se conservan al actualizar
     const producto = {
       codigo: original ? original.codigo : codigoFinal,
       nombre: form.nombre.trim(),
       descripcion: form.descripcion.trim(),
+      marca: original?.marca ?? null,
+      etiqueta: original?.etiqueta ?? null,
+      destacado: original?.destacado ?? false,
+      especificaciones: original?.especificaciones ?? [],
+      precioOferta: original?.precioOferta ?? null,
       precio: Number(form.precio),
       stock: Number.parseInt(form.stock, 10),
-      stockCritico: form.stockCritico === "" ? null : Number.parseInt(form.stockCritico, 10),
+      stockCritico: form.stockCritico === "" ? 0 : Number.parseInt(form.stockCritico, 10),
       categoria: form.categoria,
-      imagen: form.imagen.trim() || "/images/producto-placeholder.svg",
+      imagen: form.imagen.trim() || "producto-placeholder.svg",
     };
 
-    const ok = original
-      ? actualizarProducto(original.codigo, producto)
-      : crearProducto(producto);
-
-    if (!ok) {
-      setError("No se pudo guardar. Comprueba que el código no esté repetido.");
-      return;
+    try {
+      if (original) {
+        await productoService.actualizar(original.id, producto);
+      } else {
+        await productoService.crear(producto);
+      }
+      await recargar();
+      navigate("/admin/productos");
+    } catch (err) {
+      setError(mensajeDeError(err));
     }
-
-    navigate("/admin/productos");
-  }
-
-  if (codigo && !original) {
-    return (
-      <main className="admin-main">
-        <h2>Producto no encontrado</h2>
-        <Link to="/admin/productos">Volver a productos</Link>
-      </main>
-    );
   }
 
   return (
@@ -128,7 +160,7 @@ export default function AdminProductoForm() {
               <label>Categoría</label>
               <select name="categoria" value={form.categoria} onChange={cambiar}>
                 <option value="">-- Seleccione categoría --</option>
-                {CATEGORIAS.map((c) => (
+                {categorias.map((c) => (
                   <option key={c.slug} value={c.slug}>{c.nombre}</option>
                 ))}
               </select>
@@ -137,7 +169,7 @@ export default function AdminProductoForm() {
 
             <div className="campo campo-full">
               <label>Nombre</label>
-              <input name="nombre" maxLength="100" value={form.nombre} onChange={cambiar} />
+              <input name="nombre" maxLength="150" value={form.nombre} onChange={cambiar} />
               {errores.nombre && <span className="mensaje-error">{errores.nombre}</span>}
             </div>
 
@@ -167,8 +199,8 @@ export default function AdminProductoForm() {
 
             <div className="campo campo-full">
               <label>Ruta o URL de la imagen (opcional)</label>
-              <input name="imagen" value={form.imagen} onChange={cambiar} placeholder="img/productos/mi-producto.jpg" />
-              <p className="mensaje-ayuda">Las rutas locales deben corresponder a archivos dentro de public.</p>
+              <input name="imagen" value={form.imagen} onChange={cambiar} placeholder="mouse/mouse1.png" />
+              <p className="mensaje-ayuda">Ruta dentro de public/images (por ejemplo mouse/mouse1.png).</p>
             </div>
           </div>
 
