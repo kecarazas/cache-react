@@ -7,6 +7,13 @@ function ProductoCard({ producto }) {
   const { agregarAlCarrito } = useCarrito();
   const [mensajeCarrito, setMensajeCarrito] = useState("");
 
+  const sinStock = producto.stock === false || producto.stock === 0;
+  const precioActual = producto.precioFinal ?? producto.precio;
+  const precioTachado = producto.enOferta ? producto.precio : producto.precioOriginal;
+  const textoDescuento =
+    producto.descuento ||
+    (producto.etiqueta && producto.etiqueta !== "Nuevo!" ? producto.etiqueta : null);
+
   function agregarProducto(evento) {
     evento.preventDefault();
     evento.stopPropagation();
@@ -35,9 +42,9 @@ function ProductoCard({ producto }) {
           )}
 
           {/* Etiqueta de descuento */}
-          {producto.descuento && (
+          {textoDescuento && (
             <span className="badge badge-descuento">
-              {producto.descuento}
+              {textoDescuento}
             </span>
           )}
         </Link>
@@ -45,7 +52,7 @@ function ProductoCard({ producto }) {
           type="button"
           className="btn-cart-flotante"
           aria-label={`Agregar ${producto.nombre} al carrito`}
-          disabled={producto.stock === false}
+          disabled={sinStock}
           onClick={agregarProducto}
         >
           🛒
@@ -72,13 +79,13 @@ function ProductoCard({ producto }) {
         <p className="producto-card-precio">
           {producto.precioDesde && "Desde "}
 
-          {producto.precioOriginal && (
+          {precioTachado && (
             <span className="precio-tachado">
-              ${producto.precioOriginal.toLocaleString("es-CL")}
+              ${precioTachado.toLocaleString("es-CL")}
             </span>
           )}
 
-          ${producto.precio.toLocaleString("es-CL")} CLP
+          ${precioActual.toLocaleString("es-CL")} CLP
         </p>
       </Link>
       {mensajeCarrito && (

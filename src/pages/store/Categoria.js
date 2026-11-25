@@ -1,11 +1,12 @@
 import { useParams } from "react-router-dom";
 import FiltroSidebar from "../../components/FiltroSidebar";
 import ProductoGrid from "../../components/ProductoGrid";
-import { todosLosProductos } from "../../data/productos";
+import { useProductos } from "../../context/ProductosContext";
 import "../../styles/Categoria.css";
 
 function Categoria() {
   const { producto } = useParams();
+  const { productos: todosLosProductos, cargando, error } = useProductos();
 
   const nombres = {
     mouse: "Mouse",
@@ -30,7 +31,11 @@ function Categoria() {
       <main className="categoria-contenido">
         <h1>{nombre}</h1>
 
-        {productos.length > 0 ? (
+        {cargando ? (
+          <p>Cargando productos…</p>
+        ) : error ? (
+          <p className="mensaje-error" role="alert">{error}</p>
+        ) : productos.length > 0 ? (
           <ProductoGrid productos={productos} />
         ) : (
           <p>Próximamente encontrarás productos de {nombre}.</p>

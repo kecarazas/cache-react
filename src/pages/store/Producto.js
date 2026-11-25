@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { todosLosProductos } from "../../data/productos";
+import { useProductos } from "../../context/ProductosContext";
 import { useCarrito } from "../../context/CarritoContext";
 import "../../styles/Producto.css";
 
 function Producto() {
     const { slug } = useParams();
     const { agregarAlCarrito } = useCarrito();
+    const { productos: todosLosProductos, cargando, error } = useProductos();
 
     const producto = todosLosProductos.find(
     (item) => item.slug === slug
@@ -16,6 +17,23 @@ function Producto() {
     const [cantidad, setCantidad] = useState(1);
     const [tabActiva, setTabActiva] = useState("descripcion");
     const [mensajeCarrito, setMensajeCarrito] = useState("");
+
+    if (cargando) {
+        return (
+            <section className="producto-seccion">
+                <p>Cargando producto…</p>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section className="producto-seccion">
+                <p className="mensaje-error" role="alert">{error}</p>
+                <Link to="/">Volver al inicio</Link>
+            </section>
+        );
+    }
 
     if (!producto) {
         return (
@@ -46,6 +64,14 @@ function Producto() {
         producto.descripcion || "Descripción próximamente disponible.";
 
     const opiniones = producto.opiniones || 0;
+
+    const sinStock = producto.stock === false || producto.stock === 0;
+
+    const precioActual = producto.precioFinal ?? producto.precio;
+    const precioAnterior = producto.enOferta ? producto.precio : producto.precioAnterior;
+    const textoDescuento =
+        producto.descuento ||
+        (producto.etiqueta && producto.etiqueta !== "Nuevo!" ? producto.etiqueta : null);
 
     function handleAgregarAlCarrito() {
         const resultado = agregarAlCarrito(producto.slug, cantidad);
@@ -111,18 +137,18 @@ function Producto() {
                     <div className="producto-precio">
 
                         <span className="precio-actual">
-                            ${formatoPrecio(producto.precio)}
+                            ${formatoPrecio(precioActual)}
                         </span>
 
-                        {producto.precioAnterior && (
+                        {precioAnterior && (
                             <span className="precio-anterior">
-                                ${formatoPrecio(producto.precioAnterior)}
+                                ${formatoPrecio(precioAnterior)}
                             </span>
                         )}
 
-                        {producto.descuento && (
+                        {textoDescuento && (
                             <span className="precio-descuento">
-                                -{producto.descuento}%
+                                {textoDescuento}
                             </span>
                         )}
 
@@ -134,7 +160,7 @@ function Producto() {
 
                     <div className="producto-stock">
                         <span className="stock-punto"></span>
-                        {producto.stock === false
+                        {sinStock
                             ? "Sin stock"
                             : "En stock — despacho en 24-48 horas"}
                     </div>
@@ -205,7 +231,7 @@ function Producto() {
                             type="button"
                             className="btn-agregar-carrito"
                             id="btn-agregar"
-                            disabled={producto.stock === false}
+                            disabled={sinStock}
                             onClick={handleAgregarAlCarrito}
                         >
                             Agregar al carrito
@@ -214,7 +240,7 @@ function Producto() {
                         <button
                             type="button"
                             className="btn-comprar-ahora"
-                            disabled={producto.stock === false}
+                            disabled={sinStock}
                         >
                             Comprar ahora
                         </button>
