@@ -22,7 +22,7 @@ export default function AdminLayout() {
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-logo">
-          <h2>Art Tools</h2>
+          <h2>Caché</h2>
           <span>Panel administrativo</span>
         </div>
 
